@@ -10,9 +10,7 @@ package Translate v0.0.0{
 
     use Carp;
     use Carp::Assert;
-    #use Pod::Usage;
     use Text::CSV;
-    #use JSON;
 
     our @EXPORT = qw();
     my $EXPORT_OK = <<~'__EOF'
@@ -66,7 +64,7 @@ Translate - Gradescope submission script component
 Handles token ↦ uniqname translation
 by just calling Text::CSV::csv basically
 
-This script was originally written for the A8 rust assignment, which stored student submissions together with a unique identifier token.
+This script was originally written for the A8 rust assignment, which stored student submissions by a unique identifier token.
 When submitting to gradescope, the identifier needed to be translated to the corresponding uniqname.
 
 =head2 config

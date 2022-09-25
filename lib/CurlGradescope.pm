@@ -11,6 +11,7 @@ package CurlGradescope v0.0.0{
     use Carp;
     use Carp::Assert;
     use IO::Prompter;
+    use JSON;
 
     our @EXPORT = qw();
     my $EXPORT_OK = <<~'__EOF'
