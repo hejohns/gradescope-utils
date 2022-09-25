@@ -20,7 +20,6 @@ use Carp::Assert;
 use Pod::Usage;
 use File::Slurp;
 use Text::CSV;
-use JSON;
 use YAML::XS;
 use File::Temp;
 
@@ -120,8 +119,18 @@ It only collates the zip for gen_submissions.pl and the other scripts
 
 'submissions zip path' := path to submissions zip, from 'Review Graders' -> 'Export Submissions'
 
+TODO: what return types does this script/Text::CSV::csv actually support?
+
+'map submission' := takes path to dir of student's submission, returns a scalar for the "real" data
+
+'submission csv path' := output path for csv of submissions
+
+'token2uniqname csv path' := output path for csv for Translate.pm
+
 =head1 SEE ALSO
 
-../upload/
+./gen_submissions.pl
+
+./upload.pl
 
 =cut
