@@ -22,6 +22,7 @@ use File::Slurp;
 use Text::CSV;
 use YAML::XS;
 use File::Temp;
+use JSON;
 
 pod2usage(-exitval => 0, -verbose => 2) if @ARGV;
 # force user to fill out config
@@ -35,9 +36,11 @@ my %config = (
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
-$config{'submissions zip path'} = './submissions.zip';
+$config{'submissions zip path'} = '../download/submissions.zip';
 $config{'map submission'} = sub :prototype($){
-    return `cat $_[0]/*`;
+    #return `cat $_[0]/*`;
+    my $cat = `cat $_[0]/*`;
+    return JSON::to_json { one => $cat, two => 'foobar'};
 };
 $config{'submission csv path'} = 'data.csv';
 $config{'token2uniqname csv path'} = 'token2uniqname.csv';
@@ -74,7 +77,7 @@ Text::CSV::csv({
     strict => 1,
     # `csv` arguments
     in => \@aoa,
-    out => 'file.csv',
+    out => $config{'submission csv path'},
     encoding => 'UTF-8',
 }) or confess Text::CSV->error_diag;
 # generate trivial token2uniqname
@@ -89,7 +92,7 @@ Text::CSV::csv({
     strict => 1,
     # `csv` arguments
     in => \@aoa,
-    out => 'token2uniqname.csv',
+    out => $config{'token2uniqname csv path'},
     encoding => 'UTF-8',
 }) or confess Text::CSV->error_diag;
 

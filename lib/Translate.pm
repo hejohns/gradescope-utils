@@ -27,9 +27,9 @@ package Translate v0.0.0{
     );
     my @required_fields = keys %config;
 # NOTE: actually set fields
-    $config{'token,uniqname path'} = '../learnocaml.csv';
+    $config{'token,uniqname path'} = '../bin/token2uniqname.csv';
     $config{'token header'} = 'token';
-    $config{'uniqname header'} = 'nickname';
+    $config{'uniqname header'} = 'uniqname';
     grep {!defined} @config{@required_fields} and confess 'Fill out %config!';
 
     my %token2uniqname = %{Text::CSV::csv ({

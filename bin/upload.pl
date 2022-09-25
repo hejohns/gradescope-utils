@@ -33,7 +33,7 @@ my %config = (
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
-$config{'output dir path'} = 'output';
+$config{'output dir path'} = 'submissions';
 # from original python script:
 #   You can get course and assignment IDs from the URL, e.g.:
 #     https://www.gradescope.com/courses/1234/assignments/5678
@@ -47,6 +47,7 @@ my $auth_token = CurlGradescope::login();
 for my $t (keys %token2uniqname){
     say `curl -s -H 'access-token: $auth_token' -F 'owner_email=$token2uniqname{$t}\@umich.edu' -F 'files[]=\@$config{'output dir path'}/$t.csv' $CurlGradescope::baseurl/api/v1/courses/$config{'class id'}/assignments/$config{'assignment id'}/submissions`;
     carp "[warning] curl return code on $t: ${\($? >> 8)}" if $? >> 8;
+    carp "[warning] does $config{'output dir path'}/$t.csv actually exist?" if $? >> 8;
 }
 
 =pod

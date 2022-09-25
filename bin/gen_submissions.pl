@@ -20,6 +20,18 @@ use Carp::Assert;
 use Pod::Usage;
 use File::Slurp;
 use Text::CSV;
+use JSON;
+
+BEGIN{
+    if($^V lt v5.36){
+        require Scalar::Util;
+        Scalar::Util->import(qw(reftype));
+    }
+    else{
+        require builtin;
+        builtin->import(qw(reftype));
+    }
+}
 
 use Translate qw(token2uniqname);
 
@@ -46,45 +58,63 @@ my %config = (
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
-$config{'submissions path'} = '../quiz.csv';
-$config{'output dir path'} = 'mcq';
-$config{'key header(s)'} = [':', 'token', 'question_id'];
-$config{'value header(s)'} = 'answer';
+$config{'submissions path'} = './data.csv';
+$config{'output dir path'} = './submissions';
+#$config{'key header(s)'} = [':', 'token', 'question_id'];
+$config{'key header(s)'} = 'uniqname';
+$config{'value header(s)'} = 'submission';
 $config{'submission filter for student'} = sub :prototype(\%$){
     (my $submissions, my $token) = @_;
     my %filtered;
     #assert(!defined $$submissions{$token}); # why is the following line there? Just leftover from times gone by? But I feel like I remember it doing something weird
     #$filtered{$token} = $$submissions{$token};
     # I suppose this is ONE way to check that the k/v transform worked correctly
-    my @interested = grep {m/$token:(\d+)/ && 0 <= $1 && $1 <= 5} keys %$submissions;
+    #my @interested = grep {m/$token:(\d+)/ && 0 <= $1 && $1 <= 5} keys %$submissions;
+    my @interested = grep {m/$token/} keys %$submissions;
     @filtered{@interested} = @$submissions{@interested};
     delete @filtered{grep {!defined $filtered{$_}} keys %filtered};
     return %filtered;
 };
 $config{'sort filtered submission keys'} = sub :prototype(@){
-    sort {
-        $a =~ m/(\S+):(\S+)/ or confess "Failed to match. $!";
-        my $a_question_id = $2;
-        $b =~ m/(\S+):(\S+)/ or confess "Failed to match. $!";
-        my $b_question_id = $2;
-        $a_question_id <=> $b_question_id; # ascending sort
-    } @_;
+    @_;
+    #sort {
+    #    $a =~ m/(\S+):(\S+)/ or confess "Failed to match. $!";
+    #    my $a_question_id = $2;
+    #    $b =~ m/(\S+):(\S+)/ or confess "Failed to match. $!";
+    #    my $b_question_id = $2;
+    #    $a_question_id <=> $b_question_id; # ascending sort
+    #} @_;
 };
 $config{'filtered submission to csv'} = sub :prototype(\%){
     my %filtered = %{$_[0]};
     my @rows;
     foreach my $k ($config{'sort filtered submission keys'}(keys %filtered)){
-        @rows = (@rows, [$k, $filtered{$k}]);
+        my $hash = JSON::from_json $filtered{$k};
+        #@rows = (@rows, [$k, $filtered{$k}]);
+        @rows = (@rows, [$k, $hash->{one}]);
     }
     #my @temp = %filtered;
     #while(@temp){
     #    @rows = (@rows, [shift @temp, shift @temp]);
     #}
     # the header prepended should correspond to $config{'key header(s)'} and $config{'value header(s)'}
-    return [['token:question_id', 'answer'], @rows];
+    return [[convert_header($config{'key header(s)'}), convert_header($config{'value header(s)'})], @rows];
 };
 
 grep {!defined} @config{@required_fields} and confess 'Fill out %config!';
+
+sub convert_header :prototype($){
+    if(!defined reftype($_[0])){
+        $_[0];
+    }
+    elsif(reftype($_[0]) eq 'ARRAY'){
+        my @headers = @{$_[0]};
+        join($headers[0], @headers[1 .. $#headers]);
+    }
+    else{
+        confess 'unexpected ';
+    }
+}
 
 if(-e $config{'output dir path'}){
     if(-d _){
