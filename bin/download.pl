@@ -31,6 +31,8 @@ my %config = (
     'map submission' => sub :prototype($){
         confess 'need to set this';
     },
+    'submission csv path' => undef,
+    'token2uniqname csv path' => undef,
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
@@ -38,14 +40,22 @@ $config{'submissions zip path'} = './submissions.zip';
 $config{'map submission'} = sub :prototype($){
     return `cat $_[0]/*`;
 };
+$config{'submission csv path'} = 'data.csv';
+$config{'token2uniqname csv path'} = 'token2uniqname.csv';
 grep {!defined} @config{@required_fields} and confess 'Fill out %config!';
 
+if(-e $config{'submission csv path'}){
+    confess 'submission csv path already exists!';
+}
+if(-e $config{'token2uniqname csv path'}){
+    confess 'token2uniqname csv path already exists!';
+}
 my $zip = $config{'submissions zip path'};
 my $tmpdir = File::Temp->newdir();
 `cp $zip $tmpdir && unzip -d $tmpdir ${\(File::Spec->catfile($tmpdir, basename($zip)))}`;
 my $assignment_export = glob File::Spec->catfile($tmpdir, '*export');
 my ($md_yaml) = YAML::XS::LoadFile(File::Spec->catfile($assignment_export, 'submission_metadata.yml'));
-my %output; # perl hash accumulator of student submissions
+my %output; # uniqname ↦ submission perl hash accumulator
 for my $submission_id (keys %$md_yaml){
     my $email = $md_yaml->{$submission_id}->{':submitters'}->[0]->{':email'};
     $email =~ m/(\S+)\@umich\.edu/;
@@ -66,6 +76,21 @@ Text::CSV::csv({
     # `csv` arguments
     in => \@aoa,
     out => 'file.csv',
+    encoding => 'UTF-8',
+}) or confess Text::CSV->error_diag;
+# generate trivial token2uniqname
+@aoa = (['token', 'uniqname']);
+for my $k (keys %output){
+    @aoa = (@aoa, [$k, $k]);
+}
+Text::CSV::csv({
+    # attributes (OO interface)
+    binary => 0,
+    decode_utf8 => 0,
+    strict => 1,
+    # `csv` arguments
+    in => \@aoa,
+    out => 'token2uniqname.csv',
     encoding => 'UTF-8',
 }) or confess Text::CSV->error_diag;
 
