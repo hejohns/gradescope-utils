@@ -23,6 +23,7 @@ use Text::CSV;
 use JSON;
 
 use Translate qw(token2uniqname);
+use CurlGradescope;
 
 pod2usage(0) if @ARGV;
 # force user to fill out config
@@ -43,19 +44,10 @@ $config{'assignment id'} = 2274401;
 grep {!defined} @config{@required_fields} and confess 'Fill out %config!';
 
 my %token2uniqname = token2uniqname();
-# hacked together from the python script and a lot of netcat (thanks 489)
-# aka the curl snippets took a lot of trial and error
-my $baseurl = 'https://www.gradescope.com';
-my $email = IO::Prompter::prompt('Enter your email: ');
-my $password = IO::Prompter::prompt('Enter your password: ', -echo => '');
-my %response = %{JSON::from_json(`curl -s --data 'email=$email&password=$password' $baseurl/api/v1/user_session`)};
-say STDERR '[warning] ???' if $? >> 8;
-if(!defined $response{token}){
-    confess "[error] Your login credentials are probably wrong";
-}
+my $auth_token = CurlGradescope::login();
 for my $t (keys %token2uniqname){
-    say `curl -s -H 'access-token: $response{token}' -F 'owner_email=$token2uniqname{$t}\@umich.edu' -F 'files[]=\@$config{'output dir path'}/$t.csv' $baseurl/api/v1/courses/$config{'class id'}/assignments/$config{'assignment id'}/submissions`;
-    say STDERR "[warning] curl return code on $t: ${\($? >> 8)}" if $? >> 8;
+    say `curl -s -H 'access-token: $auth_token' -F 'owner_email=$token2uniqname{$t}\@umich.edu' -F 'files[]=\@$config{'output dir path'}/$t.csv' $CurlGradescope::baseurl/api/v1/courses/$config{'class id'}/assignments/$config{'assignment id'}/submissions`;
+    carp "[warning] curl return code on $t: ${\($? >> 8)}" if $? >> 8;
 }
 
 =pod
