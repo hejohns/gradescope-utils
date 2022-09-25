@@ -24,32 +24,28 @@ use JSON;
 use YAML::XS;
 use File::Temp;
 
-#use Translate qw(token2uniqname);
-#use CurlGradescope;
-
 pod2usage(0) if @ARGV;
 # force user to fill out config
 my %config = (
+    'submissions zip path' => undef,
     'map submission' => sub :prototype($){
         confess 'need to set this';
     },
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
+$config{'submissions zip path'} = './submissions.zip';
 $config{'map submission'} = sub :prototype($){
     return `cat $_[0]/*`;
 };
 grep {!defined} @config{@required_fields} and confess 'Fill out %config!';
 
-#my $auth_token = CurlGradescope::login();
-# need to download submissions zip from 'Review Graders' -> 'Export Submissions'
-my $zip = './submissions.zip';
+my $zip = $config{'submissions zip path'};
 my $tmpdir = File::Temp->newdir();
 `cp $zip $tmpdir && unzip -d $tmpdir ${\(File::Spec->catfile($tmpdir, basename($zip)))}`;
 my $assignment_export = glob File::Spec->catfile($tmpdir, '*export');
 my ($md_yaml) = YAML::XS::LoadFile(File::Spec->catfile($assignment_export, 'submission_metadata.yml'));
-#say ${$md_yaml->{submission_134933508}->{':submitters'}}[0]->{':email'};
-my %output;
+my %output; # perl hash accumulator of student submissions
 for my $submission_id (keys %$md_yaml){
     my $email = $md_yaml->{$submission_id}->{':submitters'}->[0]->{':email'};
     $email =~ m/(\S+)\@umich\.edu/;
@@ -57,6 +53,7 @@ for my $submission_id (keys %$md_yaml){
     my $submission_dir = File::Spec->catdir($assignment_export, $submission_id);
     $output{$uniqname} = $config{'map submission'}($submission_dir);
 }
+# dump %output to csv
 my @aoa = (['uniqname', 'submission']);
 for my $k (keys %output){
     @aoa = (@aoa, [$k, $output{$k}]);
@@ -78,11 +75,11 @@ Text::CSV::csv({
 
 =head1 NAME
 
-upload - Gradescope submission script component
+download - Gradescope submission script component
 
 =head1 SYNOPSIS
 
-upload.pl
+download.pl
 
 Does not take arguments
 
@@ -90,18 +87,16 @@ Does not take arguments
 
 (`perldoc THIS_FILE` to see this documentation)
 
+This script actually doesn't download anything-- you have to do that through the gradescope web interface
+
+It only collates the zip for gen_submissions.pl and the other scripts
+
 =head2 config
 
-'output dir path' := path to directory of submissions created by ./gen_submissions.pl
-
-'class id' := gradescope class id
-
-'assignment id' := gradescope assignment id
+'submissions zip path' := path to submissions zip, from 'Review Graders' -> 'Export Submissions'
 
 =head1 SEE ALSO
 
-./gen_submissions.pl
-
-./Translate.pm
+../upload/
 
 =cut
