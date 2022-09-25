@@ -8,15 +8,21 @@ use open qw(:utf8) ;
 BEGIN{$diagnostics::PRETTY = 1}
 use diagnostics -verbose;
 
-BEGIN{@INC = (@INC, '.')} # include ./Translate.pm
-use Translate qw(token2uniqname);
+use Cwd qw(abs_path);
+use File::Basename qw(dirname);
+use File::Spec;
+use lib (
+    dirname(abs_path($0)),
+    abs_path(File::Spec->rel2abs('../lib/', dirname(abs_path($0)))),
+    ); # https://stackoverflow.com/a/46550384
 use Carp;
 use Carp::Assert;
 use Pod::Usage;
 use File::Slurp;
 use Text::CSV;
 use JSON;
-use IO::Prompter;
+
+use Translate qw(token2uniqname);
 
 pod2usage(0) if @ARGV;
 # force user to fill out config
