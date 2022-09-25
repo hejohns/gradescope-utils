@@ -10,16 +10,14 @@ package CurlGradescope v0.0.0{
 
     use Carp;
     use Carp::Assert;
-    #use Pod::Usage;
-    use Text::CSV;
-    #use JSON;
+    use IO::Prompter;
 
     our @EXPORT = qw();
     my $EXPORT_OK = <<~'__EOF'
     token2uniqname
     __EOF
     ;
-    our @EXPORT_OK = split /\n+/, $EXPORT_OK, 
+    our @EXPORT_OK = split /\n+/, $EXPORT_OK,
 
 # force user to fill out config
     my %config = (
@@ -42,7 +40,7 @@ package CurlGradescope v0.0.0{
         if(!defined $response{token}){
             confess "[error] Your login credentials are probably wrong";
         }
-        carp "[debug] token_expiration_time: $response{token_expiration_time}"
+        carp "[debug] token_expiration_time: $response{token_expiration_time}";
         return $response{token};
     }
 }

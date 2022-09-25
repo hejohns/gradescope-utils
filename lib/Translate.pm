@@ -19,7 +19,7 @@ package Translate v0.0.0{
     token2uniqname
     __EOF
     ;
-    our @EXPORT_OK = split /\n+/, $EXPORT_OK, 
+    our @EXPORT_OK = split /\n+/, $EXPORT_OK,
 
 # force user to fill out config
     my %config = (
