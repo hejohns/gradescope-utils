@@ -23,7 +23,7 @@ use Text::CSV;
 use YAML::XS;
 use File::Temp;
 
-pod2usage(0) if @ARGV;
+pod2usage(-exitval => 0, -verbose => 2) if @ARGV;
 # force user to fill out config
 my %config = (
     'submissions zip path' => undef,

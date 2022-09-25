@@ -20,11 +20,10 @@ use Carp::Assert;
 use Pod::Usage;
 use File::Slurp;
 use Text::CSV;
-use JSON;
 
 use Translate qw(token2uniqname);
 
-pod2usage(0) if @ARGV;
+pod2usage(-exitval => 0, -verbose => 2) if @ARGV;
 # force user to fill out config
 my %config = (
     'submissions path' => undef,
