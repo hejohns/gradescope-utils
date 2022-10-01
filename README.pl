@@ -62,4 +62,8 @@ Just make uid = uniqname if you don't actually need uid handling
 
 Common curl stuff between scripts
 
+=head1 SEE ALSO
+
+json_pp(1)
+
 =cut
