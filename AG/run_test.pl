@@ -38,7 +38,7 @@ my %config = (
     'output path' => '/autograder/results/results.json',
     'key header(s)' => undef,
     'value header(s)' => undef,
-    'assignemnt name' => undef;
+    'assignemnt name' => undef,
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
