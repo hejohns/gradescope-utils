@@ -47,7 +47,7 @@ $config{'submission path'} = sub :prototype($){
     should(@files, 1) if DEBUG;
     return $files[0];
 };
-$config{'map submission'} => sub :prototype(\%){
+$config{'map submission'} = sub :prototype(\%){
     my %submission = %{$_[0]};
     say "[debug] submission keys: ${\(join(', ', keys %submission))}";
     my @tests = @{JSON::from_json $submission{AG}};
@@ -82,7 +82,7 @@ $config{'map submission'} => sub :prototype(\%){
 };
 $config{'key header(s)'} = 'uniqname';
 $config{'value header(s)'} = 'submission';
-$config{'assignemnt name'} => 'A1-2';
+$config{'assignemnt name'} = 'A1-2';
 grep {!defined} @config{@required_fields} and confess 'Fill out %config!';
 
 my %submission = %{Text::CSV::csv ({
