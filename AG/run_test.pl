@@ -53,11 +53,11 @@ $config{'map submission'} = sub :prototype(\%){
     my @tests = @{JSON::from_json $submission{AG}};
     my $gradescope_tests = [];
     for my $t (@tests){
-        my %gradescope_test = {
+        my %gradescope_test = (
             name => $t->{name},
             max_score => $t->{report}->{overall}->[1],
             score => $t->{report}->{overall}->[0],
-        };
+        );
         $gradescope_test{output} = <<~"__EOF"
         test_validation:
             max: $t->{report}->{test_validation}->{max}
