@@ -28,7 +28,7 @@ BEGIN{
 pod2usage(-exitval => 0, -verbose => 2) if @ARGV;
 # force user to fill out config
 my %config = (
-    'submission dir path' => '/autograder/submission/'
+    'submission dir path' => '/autograder/submission/',
     'submission path' => sub :prototype($){
         confess 'Need to fill this out!';
     },
