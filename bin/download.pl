@@ -80,7 +80,7 @@ Text::CSV::csv({
     # `csv` arguments
     in => \@aoa,
     out => $config{'submission csv path'},
-    encoding => 'UTF-8',
+    encoding => ':utf8',
 }) or confess Text::CSV->error_diag;
 # generate trivial token2uniqname
 @aoa = (['token', 'uniqname']);
@@ -95,7 +95,7 @@ Text::CSV::csv({
     # `csv` arguments
     in => \@aoa,
     out => $config{'token2uniqname csv path'},
-    encoding => 'UTF-8',
+    encoding => ':utf8',
 }) or confess Text::CSV->error_diag;
 
 =pod

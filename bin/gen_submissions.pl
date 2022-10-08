@@ -149,7 +149,7 @@ my %submissions = %{Text::CSV::csv({
     strict => 1,
     # `csv` arguments
     in => $config{'submissions path'},
-    encoding => 'UTF-8',
+    encoding => ':utf8',
     key => $config{'key header(s)'},
     value => $config{'value header(s)'},
 }) or confess Text::CSV->error_diag};
@@ -166,7 +166,7 @@ for my $t (keys %token2uniqname){
         # `csv` arguments
         in => $config{'filtered submission to csv'}(\%filtered),
         out => "$config{'output dir path'}/$t.csv",
-        encoding => 'UTF-8',
+        encoding => ':utf8',
     );
 }
 
