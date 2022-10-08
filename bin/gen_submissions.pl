@@ -21,6 +21,7 @@ use Pod::Usage;
 use File::Slurp;
 use Text::CSV;
 use JSON;
+use Data::Dumper;
 
 BEGIN{
     if($^V lt v5.36){
@@ -58,8 +59,8 @@ my %config = (
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
-$config{'submissions path'} = './data.csv';
-$config{'output dir path'} = './submissions';
+$config{'submissions path'} = "$ENV{HOME}/Downloads/data.csv";
+$config{'output dir path'} = "$ENV{HOME}/Downloads/output";
 #$config{'key header(s)'} = [':', 'token', 'question_id'];
 $config{'key header(s)'} = 'uniqname';
 $config{'value header(s)'} = 'submission';
@@ -76,7 +77,7 @@ $config{'submission filter for student'} = sub :prototype(\%$){
     return %filtered;
 };
 $config{'sort filtered submission keys'} = sub :prototype(@){
-    @_;
+    sort @_; # not sure what order I'd want, sort just to be deterministic
     #sort {
     #    $a =~ m/(\S+):(\S+)/ or confess "Failed to match. $!";
     #    my $a_question_id = $2;
@@ -89,9 +90,22 @@ $config{'filtered submission to csv'} = sub :prototype(\%){
     my %filtered = %{$_[0]};
     my @rows;
     foreach my $k ($config{'sort filtered submission keys'}(keys %filtered)){
-        my $hash = JSON::from_json $filtered{$k};
+        #my $hash = JSON::from_json $filtered{$k};
+        my ($tmp_fh, $tmp) = File::Temp::tempfile();
+        print $tmp_fh $filtered{$k};
+        my $cwd = Cwd::getcwd();
+        chdir "$ENV{HOME}/documentsNoSync/hazel";
+        chomp(my $processed = `dune exec ./src/haz3lschool/gradescope.exe $tmp`);
+        chdir $cwd;
+        my @yuchened = @{JSON::from_json $processed};
         #@rows = (@rows, [$k, $filtered{$k}]);
-        @rows = (@rows, [$k, $hash->{one}]);
+        $Data::Dumper::Indent = 2;
+        $Data::Dumper::Terse = 1; # too much noise
+        $Data::Dumper::Sortkeys = 1; # more determinism
+        @rows = (@rows,
+            ['AG', JSON::to_json \@yuchened],
+            ['PRETTY', Data::Dumper::Dumper(\@yuchened)],
+        );
     }
     #my @temp = %filtered;
     #while(@temp){
