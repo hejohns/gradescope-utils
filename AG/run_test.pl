@@ -101,13 +101,13 @@ my @answers = (0, 3, 1, 2, 3, 0);
 
 my %output; # gradescope expects JSON test output
 my $s = &{$config{'map submission'}}(\%submission);
-if(reftype $s eq 'ARRAY'){
-    say '[debug] Using individual tests grading';
-    $output{tests} = $s;
-}
-elsif(!defined reftype $s){
+if(!defined reftype $s){
     say '[debug] Using top level (total) score grading';
     $output{score} = $s;
+}
+elsif(reftype $s eq 'ARRAY'){
+    say '[debug] Using individual tests grading';
+    $output{tests} = $s;
 }
 else{
     confess "[error] `perldoc $0` to see how 'map submission' is supposed to be used";
