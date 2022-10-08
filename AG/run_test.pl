@@ -78,6 +78,7 @@ $config{'map submission'} => sub :prototype(\%){
         ;
         $gradescope_tests = [(@$gradescope_tests), \%gradescope_test];
     }
+    return $gradescope_tests;
 };
 $config{'key header(s)'} = 'uniqname';
 $config{'value header(s)'} = 'submission';
