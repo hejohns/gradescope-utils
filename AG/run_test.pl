@@ -100,7 +100,7 @@ my @answers = (0, 3, 1, 2, 3, 0);
 #should(keys %submission, @answers) if DEBUG;
 
 my %output; # gradescope expects JSON test output
-my $s = &{$config{'map submission'}}(\%output);
+my $s = &{$config{'map submission'}}(\%submission);
 if(reftype $s eq 'ARRAY'){
     say '[debug] Using individual tests grading';
     $output{tests} = $s;
