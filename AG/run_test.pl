@@ -58,7 +58,7 @@ $config{'map submission'} => sub :prototype(\%){
             max_score => $t->{report}->{overall}->[1],
             score => $t->{report}->{overall}->[0],
         };
-        my $gradescope_test{output} = <<~"__EOF"
+        $gradescope_test{output} = <<~"__EOF"
         test_validation:
             max: $t->{report}->{test_validation}->{max}
             percentage: $t->{report}->{test_validation}->{percentage}
