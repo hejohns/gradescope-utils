@@ -58,23 +58,24 @@ $config{'map submission'} = sub :prototype(\%){
             max_score => $t->{report}->{overall}->[1],
             score => $t->{report}->{overall}->[0],
         );
-        $gradescope_test{output} = <<~"__EOF"
-        test_validation:
-            max: $t->{report}->{test_validation}->{max}
-            percentage: $t->{report}->{test_validation}->{percentage}
-            src:
-            $t->{report}->{test_validation}->{src}
-        mutation_testing:
-            max: $t->{report}->{mutation_testing}->{max}
-            percentage: $t->{report}->{mutation_testing}->{percentage}
-            src:
-            $t->{report}->{mutation_testing}->{src}
-        impl_grading:
-            max: $t->{report}->{impl_grading}->{max}
-            percentage: $t->{report}->{impl_grading}->{percentage}
-            src:
-            $t->{report}->{impl_grading}->{src}
-        __EOF
+        $gradescope_test{output} = 'see gradescope interface, not using this output right now';
+        #$gradescope_test{output} = <<~"__EOF"
+        #test_validation:
+        #    max: $t->{report}->{test_validation}->{max}
+        #    percentage: $t->{report}->{test_validation}->{percentage}
+        #    src:
+        #    $t->{report}->{test_validation}->{src}
+        #mutation_testing:
+        #    max: $t->{report}->{mutation_testing}->{max}
+        #    percentage: $t->{report}->{mutation_testing}->{percentage}
+        #    src:
+        #    $t->{report}->{mutation_testing}->{src}
+        #impl_grading:
+        #    max: $t->{report}->{impl_grading}->{max}
+        #    percentage: $t->{report}->{impl_grading}->{percentage}
+        #    src:
+        #    $t->{report}->{impl_grading}->{src}
+        #__EOF
         ;
         $gradescope_tests = [(@$gradescope_tests), \%gradescope_test];
     }
