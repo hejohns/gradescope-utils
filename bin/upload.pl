@@ -33,7 +33,7 @@ my %config = (
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
-$config{'output dir path'} = "$ENV{HOME}/Downloads/output";
+$config{'output dir path'} = "$ENV{HOME}/Downloads/REAL_output";
 # from original python script:
 #   You can get course and assignment IDs from the URL, e.g.:
 #     https://www.gradescope.com/courses/1234/assignments/5678

@@ -27,7 +27,7 @@ package Translate v0.0.0{
     );
     my @required_fields = keys %config;
 # NOTE: actually set fields
-    $config{'token,uniqname path'} = '../bin/token2uniqname.csv';
+    $config{'token,uniqname path'} = "$ENV{HOME}/Downloads/REAL_token2uniqname.csv";
     $config{'token header'} = 'token';
     $config{'uniqname header'} = 'uniqname';
     grep {!defined} @config{@required_fields} and confess 'Fill out %config!';

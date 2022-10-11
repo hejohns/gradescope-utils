@@ -36,7 +36,7 @@ my %config = (
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
-$config{'submissions zip path'} = "$ENV{HOME}/Downloads/a1-submissions.zip";
+$config{'submissions zip path'} = "$ENV{HOME}/Downloads/REAL_fixed_submissions.zip";
 $config{'map submission'} = sub :prototype($){
     #return `cat $_[0]/*`;
     my $cat = `cat $_[0]/*`;
@@ -44,8 +44,8 @@ $config{'map submission'} = sub :prototype($){
     # check json is valid
     return JSON::to_json (JSON::from_json $cat);
 };
-$config{'submission csv path'} = "$ENV{HOME}/Downloads/data.csv";
-$config{'token2uniqname csv path'} = "$ENV{HOME}/Downloads/token2uniqname.csv";
+$config{'submission csv path'} = "$ENV{HOME}/Downloads/REAL_data.csv";
+$config{'token2uniqname csv path'} = "$ENV{HOME}/Downloads/REAL_token2uniqname.csv";
 grep {!defined} @config{@required_fields} and confess 'Fill out %config!';
 
 if(-e $config{'submission csv path'}){
