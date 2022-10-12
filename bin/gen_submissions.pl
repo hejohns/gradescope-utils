@@ -188,6 +188,7 @@ for my $t (keys %token2uniqname){
         out => "$config{'output dir path'}/$t.csv",
         encoding => ':utf8',
     );
+    0;
     } and next;
 }
 
