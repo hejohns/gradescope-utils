@@ -42,6 +42,7 @@ my %config = (
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
+$config{'assignemnt name'} = 'A3-4';
 $config{'submission path'} = sub :prototype($){
     my @files = glob "$_[0]/*.csv";
     should(@files, 1) if DEBUG;
@@ -83,7 +84,6 @@ $config{'map submission'} = sub :prototype(\%){
 };
 $config{'key header(s)'} = 'uniqname';
 $config{'value header(s)'} = 'submission';
-$config{'assignemnt name'} = 'A1-2';
 grep {!defined} @config{@required_fields} and confess 'Fill out %config!';
 
 my %submission = %{Text::CSV::csv ({
