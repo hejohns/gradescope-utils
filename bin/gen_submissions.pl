@@ -30,6 +30,7 @@ BEGIN{
     }
     else{
         require builtin;
+        warnings->import('-experimental::builtin');
         builtin->import(qw(reftype));
     }
 }
