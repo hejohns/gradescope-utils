@@ -60,8 +60,8 @@ my %config = (
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
-$config{'submissions path'} = "$ENV{HOME}/Downloads/REAL_data.csv";
-$config{'output dir path'} = "$ENV{HOME}/Downloads/REAL_output";
+$config{'submissions path'} = "$ENV{HOME}/Downloads/a34_data.csv";
+$config{'output dir path'} = "$ENV{HOME}/Downloads/a34_output";
 #$config{'key header(s)'} = [':', 'token', 'question_id'];
 $config{'key header(s)'} = 'uniqname';
 $config{'value header(s)'} = 'submission';
