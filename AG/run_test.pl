@@ -21,6 +21,7 @@ BEGIN{
     }
     else{
         require builtin;
+        warnings->import('-experimental::builtin');
         builtin->import(qw(reftype));
     }
 }
@@ -42,6 +43,7 @@ my %config = (
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
+$config{'assignemnt name'} = 'A3-4';
 $config{'submission path'} = sub :prototype($){
     my @files = glob "$_[0]/*.csv";
     should(@files, 1) if DEBUG;
@@ -58,23 +60,24 @@ $config{'map submission'} = sub :prototype(\%){
             max_score => $t->{report}->{overall}->[1],
             score => $t->{report}->{overall}->[0],
         );
-        $gradescope_test{output} = <<~"__EOF"
-        test_validation:
-            max: $t->{report}->{test_validation}->{max}
-            percentage: $t->{report}->{test_validation}->{percentage}
-            src:
-            $t->{report}->{test_validation}->{src}
-        mutation_testing:
-            max: $t->{report}->{mutation_testing}->{max}
-            percentage: $t->{report}->{mutation_testing}->{percentage}
-            src:
-            $t->{report}->{mutation_testing}->{src}
-        impl_grading:
-            max: $t->{report}->{impl_grading}->{max}
-            percentage: $t->{report}->{impl_grading}->{percentage}
-            src:
-            $t->{report}->{impl_grading}->{src}
-        __EOF
+        $gradescope_test{output} = 'see gradescope interface, not using this output right now';
+        #$gradescope_test{output} = <<~"__EOF"
+        #test_validation:
+        #    max: $t->{report}->{test_validation}->{max}
+        #    percentage: $t->{report}->{test_validation}->{percentage}
+        #    src:
+        #    $t->{report}->{test_validation}->{src}
+        #mutation_testing:
+        #    max: $t->{report}->{mutation_testing}->{max}
+        #    percentage: $t->{report}->{mutation_testing}->{percentage}
+        #    src:
+        #    $t->{report}->{mutation_testing}->{src}
+        #impl_grading:
+        #    max: $t->{report}->{impl_grading}->{max}
+        #    percentage: $t->{report}->{impl_grading}->{percentage}
+        #    src:
+        #    $t->{report}->{impl_grading}->{src}
+        #__EOF
         ;
         $gradescope_tests = [(@$gradescope_tests), \%gradescope_test];
     }
@@ -82,7 +85,6 @@ $config{'map submission'} = sub :prototype(\%){
 };
 $config{'key header(s)'} = 'uniqname';
 $config{'value header(s)'} = 'submission';
-$config{'assignemnt name'} = 'A1-2';
 grep {!defined} @config{@required_fields} and confess 'Fill out %config!';
 
 my %submission = %{Text::CSV::csv ({
@@ -101,13 +103,13 @@ my @answers = (0, 3, 1, 2, 3, 0);
 
 my %output; # gradescope expects JSON test output
 my $s = &{$config{'map submission'}}(\%submission);
-if(reftype $s eq 'ARRAY'){
-    say '[debug] Using individual tests grading';
-    $output{tests} = $s;
-}
-elsif(!defined reftype $s){
+if(!defined reftype $s){
     say '[debug] Using top level (total) score grading';
     $output{score} = $s;
+}
+elsif(reftype $s eq 'ARRAY'){
+    say '[debug] Using individual tests grading';
+    $output{tests} = $s;
 }
 else{
     confess "[error] `perldoc $0` to see how 'map submission' is supposed to be used";

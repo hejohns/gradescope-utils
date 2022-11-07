@@ -30,6 +30,7 @@ BEGIN{
     }
     else{
         require builtin;
+        warnings->import('-experimental::builtin');
         builtin->import(qw(reftype));
     }
 }
@@ -59,8 +60,8 @@ my %config = (
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
-$config{'submissions path'} = "$ENV{HOME}/Downloads/data.csv";
-$config{'output dir path'} = "$ENV{HOME}/Downloads/output";
+$config{'submissions path'} = "$ENV{HOME}/Downloads/a34_data.csv";
+$config{'output dir path'} = "$ENV{HOME}/Downloads/a34_output";
 #$config{'key header(s)'} = [':', 'token', 'question_id'];
 $config{'key header(s)'} = 'uniqname';
 $config{'value header(s)'} = 'submission';
@@ -94,17 +95,36 @@ $config{'filtered submission to csv'} = sub :prototype(\%){
         my ($tmp_fh, $tmp) = File::Temp::tempfile();
         print $tmp_fh $filtered{$k};
         my $cwd = Cwd::getcwd();
-        chdir "$ENV{HOME}/documentsNoSync/hazel";
-        chomp(my $processed = `dune exec ./src/haz3lschool/gradescope.exe $tmp`);
+        chdir "$ENV{HOME}/documentsNoSync/hazel-490";
+        chomp(my $processed = `timeout --kill-after=20s 10s dune exec ./src/haz3lschool/gradescope.exe $tmp`);
         chdir $cwd;
+        if($? >> 8){
+            confess "dune returned exit code ${\($? >> 8)} on $k";
+        }
+        say "[debug] $k";
         my @yuchened = @{JSON::from_json $processed};
         #@rows = (@rows, [$k, $filtered{$k}]);
-        $Data::Dumper::Indent = 2;
-        $Data::Dumper::Terse = 1; # too much noise
-        $Data::Dumper::Sortkeys = 1; # more determinism
+        #
+        #$Data::Dumper::Indent = 2;
+        #$Data::Dumper::Terse = 1; # too much noise
+        #$Data::Dumper::Sortkeys = 1; # more determinism
+        #@rows = (@rows,
+        #    ['AG', JSON::to_json \@yuchened],
+        #    ['PRETTY', Data::Dumper::Dumper(\@yuchened)],
+        #);
+        my $pretty;
+        for my $t (@yuchened){
+            $pretty .= <<~"__EOF"
+            --------------------
+            name: $t->{name}
+            $t->{report}->{summary}
+            --------------------
+            __EOF
+            ;
+        }
         @rows = (@rows,
+            ['PRETTY', $pretty],
             ['AG', JSON::to_json \@yuchened],
-            ['PRETTY', Data::Dumper::Dumper(\@yuchened)],
         );
     }
     #my @temp = %filtered;
@@ -158,6 +178,7 @@ my %token2uniqname = token2uniqname();
 for my $t (keys %token2uniqname){
     my %filtered = $config{'submission filter for student'}(\%submissions, $t);
     next if keys %filtered == 0;
+    eval{
     Text::CSV::csv(
         # attributes (OO interface)
         binary => 0,
@@ -168,6 +189,8 @@ for my $t (keys %token2uniqname){
         out => "$config{'output dir path'}/$t.csv",
         encoding => ':utf8',
     );
+    0;
+    } and next;
 }
 
 =pod

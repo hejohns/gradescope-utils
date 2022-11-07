@@ -33,13 +33,13 @@ my %config = (
 );
 my @required_fields = keys %config;
 # NOTE: actually set fields
-$config{'output dir path'} = "$ENV{HOME}/Downloads/output";
+$config{'output dir path'} = "$ENV{HOME}/Downloads/a34_output";
 # from original python script:
 #   You can get course and assignment IDs from the URL, e.g.:
 #     https://www.gradescope.com/courses/1234/assignments/5678
 #     course_id = 1234, assignment_id = 5678
-$config{'class id'} = 447138;
-$config{'assignment id'} = 2274401;
+$config{'class id'} = 430829;
+$config{'assignment id'} = 2353274;
 grep {!defined} @config{@required_fields} and confess 'Fill out %config!';
 
 my %token2uniqname = token2uniqname();
