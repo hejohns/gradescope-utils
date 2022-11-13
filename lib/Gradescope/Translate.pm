@@ -1,4 +1,4 @@
-package Gradescope::Translate v2022.11.13{
+package Gradescope::Translate v2022.11.13 {
     use v5.36;
     use utf8;
     use strictures 2; # nice `use strict`, `use warnings` defaults
@@ -16,13 +16,15 @@ package Gradescope::Translate v2022.11.13{
     use Carp::Assert;
     use Text::CSV;
 
-    use parent qw(Exporter Tie::Hash);
+    use parent qw(Exporter);
 
     # default exports
     our @EXPORT = qw();
     # optional exports
     our @EXPORT_OK = qw(
-        login
+        print_csv
+        read_csv
+        token2uniqname
     );
 
     #sub import {
@@ -47,6 +49,9 @@ package Gradescope::Translate v2022.11.13{
     #    assert(defined($baseurl));
     #}
 
+    our $token2uniqname_key_header = 'token';
+    our $token2uniqname_value_header = 'uniqname';
+
     sub print_csv {
         my ($in, $out) = @_;
         Text::CSV::csv({
@@ -61,10 +66,9 @@ package Gradescope::Translate v2022.11.13{
         }) or confess Text::CSV->error_diag;
     }
 
-    sub TIEHASH {
-        my ($classname, $csv_path, $key_header, $value_header) = $@;
-        should($classname, __PACKAGE__) if DEBUG;
-        my $token2uniqname = Text::CSV::csv ({
+    sub read_csv {
+        my ($csv_path, $key_header, $value_header) = @_;
+        my %kv = %{Text::CSV::csv ({
             # attributes (OO interface)
             binary => 0,
             decode_utf8 => 0,
@@ -72,31 +76,14 @@ package Gradescope::Translate v2022.11.13{
             # `csv` arguments
             in => $csv_path,
             encoding => 'UTF-8',
-            key => ,
-            value => ,
-        }) or confess Text::CSV->error_diag;
-        return bless {
-            hash => $token2uniqname
-        }, $classname;
+            key => $key_header,
+            value => $value_header,
+        }) or confess Text::CSV->error_diag};
+        return %kv;
     }
-
-    sub STORE {
-    }
-
-    my %token2uniqname = %{Text::CSV::csv ({
-        # attributes (OO interface)
-        binary => 0,
-        decode_utf8 => 0,
-        strict => 1,
-        # `csv` arguments
-        in => $config{'token,uniqname path'},
-        encoding => 'UTF-8',
-        key => $config{'token header'},
-        value => $config{'uniqname header'},
-    }) or confess Text::CSV->error_diag};
 
     sub token2uniqname {
-        return %token2uniqname;
+        return read_csv($_[0], $token2uniqname_key_header, $token2uniqname_value_header)
     }
 }
 

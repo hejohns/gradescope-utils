@@ -1,4 +1,4 @@
-package Gradescope::Curl v2022.11.13{
+package Gradescope::Curl v2022.11.13 {
     use v5.36;
     use utf8;
     use strictures 2; # nice `use strict`, `use warnings` defaults
@@ -26,11 +26,7 @@ package Gradescope::Curl v2022.11.13{
         login
     );
 
-    # hacked together from the python script and a lot of netcat (thanks 489)
-    # aka the curl snippets took a lot of trial and error
     our $baseurl;
-    my $email = IO::Prompter::prompt('Enter your email: ');
-    my $password = IO::Prompter::prompt('Enter your password: ', -echo => '');
 
     sub import {
         # in the style of Getopt::Long
@@ -54,11 +50,17 @@ package Gradescope::Curl v2022.11.13{
         assert(defined($baseurl));
     }
 
-    sub login{
+    sub login {
+        # hacked together from the python script and a lot of netcat (thanks 489)
+        # aka the curl snippets took a lot of trial and error
+        my $email = IO::Prompter::prompt('Enter your email: ', -in => *STDIN);
+        my $password = IO::Prompter::prompt('Enter your password: ', -in => *STDIN, -echo => '');
         my %response = %{JSON::from_json(`curl -s --data 'email=$email&password=$password' $baseurl/api/v1/user_session`)};
         carp '[warning] curl returned error code on gradescope auth' if $? >> 8;
         $response{token} // confess "[error] Your gradescope login credentials are probably wrong";
         carp "[debug] token_expiration_time: $response{token_expiration_time}";
         return $response{token};
     }
+
+    builtin::true;
 }

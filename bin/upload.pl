@@ -46,24 +46,19 @@ use Gradescope::Curl qw(:config baseurl https://www.gradescope.com);
 
 my %options;
 GetOptions(\%options, 'help|h|?') or pod2usage(-exitval => 1, -verbose => 2);
-pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 1;
-# force user to fill out config
-my %config = (
-    'output dir path' => undef,
-    'class id' => undef,
-    'assignment id' => undef,
-);
+pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 4;
 # from original python script:
 #   You can get course and assignment IDs from the URL, e.g.:
 #     https://www.gradescope.com/courses/1234/assignments/5678
 #     course_id = 1234, assignment_id = 5678
-
-my %token2uniqname = token2uniqname();
-my $auth_token = CurlGradescope::login();
+my ($submissions, $token2uniqname, $class_id, $assignment_id) = @ARGV;
+my %token2uniqname = token2uniqname($token2uniqname);
+my $auth_token = Gradescope::Curl::login();
 for my $t (keys %token2uniqname){
-    say `curl -s -H 'access-token: $auth_token' -F 'owner_email=$token2uniqname{$t}\@umich.edu' -F 'files[]=\@$config{'output dir path'}/$t.csv' $CurlGradescope::baseurl/api/v1/courses/$config{'class id'}/assignments/$config{'assignment id'}/submissions`;
+    my $f = File::Spec->catfile($submissions, "$t.csv");
+    say `curl -s -H 'access-token: $auth_token' -F 'owner_email=$token2uniqname{$t}\@umich.edu' -F 'files[]=\@$f' $Gradescope::Curl::baseurl/api/v1/courses/$class_id/assignments/$assignment_id/submissions`;
     carp "[warning] curl return code on $t: ${\($? >> 8)}" if $? >> 8;
-    carp "[warning] does $config{'output dir path'}/$t.csv actually exist?" if $? >> 8;
+    carp "[warning] does $f actually exist?" if $? >> 8;
 }
 
 =pod

@@ -81,7 +81,7 @@ Gradescope::Translate::print_csv(\@aoa, *STDOUT);
 if (defined $options{token2uniqname}){
     $options{token2uniqname} = abs_path($options{token2uniqname});
     # generate trivial token2uniqname
-    @aoa = (['token', 'uniqname']);
+    @aoa = ([$Gradescope::Translate::token2uniqname_key_header, $Gradescope::Translate::token2uniqname_value_header]);
     for my $k (keys %output){
         @aoa = (@aoa, [$k, $k]);
     }
@@ -102,11 +102,15 @@ join.pl [options] gradescope_export_submissions_zip
 
 =head1 DESCRIPTION
 
+prints csv of all submissions to stdout
+
 =head1 OPTIONS
 
 =head2 help|h|?
 
 =head2 fun|lambda|f|λ
+
+defaults to `cat.pl`
 
 =head2 token2uniqname|t2u=s
 
