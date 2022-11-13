@@ -1,46 +1,62 @@
 #!/usr/bin/env perl
 
-use v5.34;
+use v5.36;
 use utf8;
-use strict;
-use warnings FATAL => 'all';
-use open qw(:utf8) ;
-BEGIN{$diagnostics::PRETTY = 1}
+use strictures 2; # nice `use strict`, `use warnings` defaults
+use open qw(:utf8); # try to use Perl's internal Unicode encoding for everything
+BEGIN{$diagnostics::PRETTY = 1} # a bit noisy, but somewhat informative
 use diagnostics -verbose;
 
-use Cwd qw(abs_path);
-use File::Basename qw(dirname);
-use File::Spec;
-use lib (
-    dirname(abs_path($0)),
-    abs_path(File::Spec->rel2abs('../lib/', dirname(abs_path($0)))),
-    ); # https://stackoverflow.com/a/46550384
-use Carp;
-use Carp::Assert;
-use Pod::Usage;
-use File::Slurp;
-use Text::CSV;
+# Carp
+    use Carp;
+    use Carp::Assert;
+# filepath functions
+    use Cwd qw(abs_path);
+    use File::Basename qw(basename dirname);
+    use File::Spec;
+# misc file utilities
+    use File::Temp;
+    use File::Slurp;
+    use Text::CSV;
+    use JSON;
+    use YAML::XS;
+# misc scripting IO utilities
+    use IO::Prompter;
+    # `capture_stdout` for backticks w/o shell
+    use Capture::Tiny qw(:all);
+# option/arg handling
+    use Getopt::Long qw(:config gnu_getopt auto_version); # auto_help not the greatest
+    use Pod::Usage;
+# use local modules
+    use lib (
+        dirname(abs_path($0)),
+        abs_path(File::Spec->rel2abs('../lib/', dirname(abs_path($0)))),
+        ); # https://stackoverflow.com/a/46550384
+ 
+# turn on features
+    use builtin;
+    no warnings 'experimental::builtin';
+    use feature 'try';
+    no warnings 'experimental::try';
 
-use Translate qw(token2uniqname);
-use CurlGradescope;
+    our $VERSION = version->declare('v2022.11.13');
+# end prelude
+use Gradescope::Translate qw(token2uniqname);
+use Gradescope::Curl qw(:config baseurl https://www.gradescope.com);
 
-pod2usage(-exitval => 0, -verbose => 2) if @ARGV;
+my %options;
+GetOptions(\%options, 'help|h|?') or pod2usage(-exitval => 1, -verbose => 2);
+pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 1;
 # force user to fill out config
 my %config = (
     'output dir path' => undef,
     'class id' => undef,
     'assignment id' => undef,
 );
-my @required_fields = keys %config;
-# NOTE: actually set fields
-$config{'output dir path'} = "$ENV{HOME}/Downloads/a34_output";
 # from original python script:
 #   You can get course and assignment IDs from the URL, e.g.:
 #     https://www.gradescope.com/courses/1234/assignments/5678
 #     course_id = 1234, assignment_id = 5678
-$config{'class id'} = 430829;
-$config{'assignment id'} = 2353274;
-grep {!defined} @config{@required_fields} and confess 'Fill out %config!';
 
 my %token2uniqname = token2uniqname();
 my $auth_token = CurlGradescope::login();

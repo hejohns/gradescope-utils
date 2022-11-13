@@ -38,6 +38,7 @@ use diagnostics -verbose;
 
     our $VERSION = version->declare('v2022.11.13');
 # end prelude
+use Gradescope::Translate;
 
 my %options;
 GetOptions(\%options, 'help|h|?', 'fun|lambda|f|λ=s', 'token2uniqname|t2u=s') or pod2usage(-exitval => 1, -verbose => 2);
@@ -71,20 +72,12 @@ for my $submission_id (keys %md_yaml){
     $output{$uniqname} = $submission;
 }
 # dump %output to csv
-my @aoa = (['uniqname', 'submission']);
+my @aoa;
+@aoa = (['uniqname', 'submission']);
 for my $k (keys %output){
     @aoa = (@aoa, [$k, $output{$k}]);
 }
-Text::CSV::csv({
-    # attributes (OO interface)
-    binary => 0,
-    decode_utf8 => 0,
-    strict => 1,
-    # `csv` arguments
-    in => \@aoa,
-    out => *STDOUT,
-    encoding => ':utf8',
-}) or confess Text::CSV->error_diag;
+Gradescope::Translate::csv(\@aoa, *STDOUT);
 if (defined $options{token2uniqname}){
     $options{token2uniqname} = abs_path($options{token2uniqname});
     # generate trivial token2uniqname
@@ -92,16 +85,7 @@ if (defined $options{token2uniqname}){
     for my $k (keys %output){
         @aoa = (@aoa, [$k, $k]);
     }
-    Text::CSV::csv({
-        # attributes (OO interface)
-        binary => 0,
-        decode_utf8 => 0,
-        strict => 1,
-        # `csv` arguments
-        in => \@aoa,
-        out => $options{token2uniqname},
-        encoding => ':utf8',
-    }) or confess Text::CSV->error_diag;
+    Gradescope::Translate::csv(\@aoa, $options{token2uniqname});
 }
 
 =pod
