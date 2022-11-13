@@ -47,7 +47,7 @@ package Gradescope::Translate v2022.11.13{
     #    assert(defined($baseurl));
     #}
 
-    sub csv {
+    sub print_csv {
         my ($in, $out) = @_;
         Text::CSV::csv({
             # attributes (OO interface)

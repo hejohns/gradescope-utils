@@ -77,7 +77,7 @@ my @aoa;
 for my $k (keys %output){
     @aoa = (@aoa, [$k, $output{$k}]);
 }
-Gradescope::Translate::csv(\@aoa, *STDOUT);
+Gradescope::Translate::print_csv(\@aoa, *STDOUT);
 if (defined $options{token2uniqname}){
     $options{token2uniqname} = abs_path($options{token2uniqname});
     # generate trivial token2uniqname
@@ -85,7 +85,7 @@ if (defined $options{token2uniqname}){
     for my $k (keys %output){
         @aoa = (@aoa, [$k, $k]);
     }
-    Gradescope::Translate::csv(\@aoa, $options{token2uniqname});
+    Gradescope::Translate::print_csv(\@aoa, $options{token2uniqname});
 }
 
 =pod
