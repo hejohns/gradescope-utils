@@ -7,7 +7,7 @@ package Gradescope::Curl v2022.11.13 {
     use diagnostics -verbose;
 
     # turn on features
-        use builtin;
+        use builtin qw(true false is_bool reftype);
         no warnings 'experimental::builtin';
         use feature 'try';
         no warnings 'experimental::try';
@@ -62,5 +62,5 @@ package Gradescope::Curl v2022.11.13 {
         return $response{token};
     }
 
-    builtin::true;
+    true;
 }

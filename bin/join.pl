@@ -21,6 +21,7 @@ use diagnostics -verbose;
     use JSON;
     use YAML::XS;
 # misc scripting IO utilities
+    use IO::Prompter;
     # `capture_stdout` for backticks w/o shell
     use Capture::Tiny qw(:all);
 # option/arg handling
@@ -33,6 +34,8 @@ use diagnostics -verbose;
         ); # https://stackoverflow.com/a/46550384
  
 # turn on features
+    use builtin qw(true false is_bool reftype);
+    no warnings 'experimental::builtin';
     use feature 'try';
     no warnings 'experimental::try';
 
@@ -41,7 +44,7 @@ use diagnostics -verbose;
 use Gradescope::Translate;
 
 my %options;
-GetOptions(\%options, 'help|h|?', 'fun|lambda|f|λ=s', 'token2uniqname|t2u=s') or pod2usage(-exitval => 1, -verbose => 2);
+GetOptions(\%options, 'help|h|?', 'fun|lambda|f|λ=s', 'token2uniqname|t=s') or pod2usage(-exitval => 1, -verbose => 2);
 pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 1;
 
 $options{fun} //= 'cat.pl';
@@ -73,7 +76,7 @@ for my $submission_id (keys %md_yaml){
 }
 # dump %output to csv
 my @aoa;
-@aoa = (['uniqname', 'submission']);
+@aoa = (['token', 'submission']);
 for my $k (keys %output){
     @aoa = (@aoa, [$k, $output{$k}]);
 }
@@ -104,14 +107,16 @@ join.pl [options] gradescope_export_submissions_zip
 
 prints csv of all submissions to stdout
 
+does B<not> support -
+
 =head1 OPTIONS
 
 =head2 help|h|?
 
 =head2 fun|lambda|f|λ
 
-defaults to `cat.pl`
+defaults to F<cat.pl>
 
-=head2 token2uniqname|t2u=s
+=head2 token2uniqname|t=s
 
 =cut
