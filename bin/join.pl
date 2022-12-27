@@ -44,10 +44,14 @@ use diagnostics -verbose;
 use Gradescope::Translate;
 
 my %options;
-GetOptions(\%options, 'help|h|?', 'fun|lambda|f|λ=s', 'token2uniqname|t=s') or pod2usage(-exitval => 1, -verbose => 2);
+GetOptions(\%options,
+    'help|h|?',
+    'fun|lambda|f|λ=s@',
+    'token2uniqname|t=s'
+) or pod2usage(-exitval => 1, -verbose => 2);
 pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 1;
 
-$options{fun} //= 'cat.pl';
+$options{fun} //= ['cat'];
 my ($submissions_zip) = @ARGV;
 assert(defined($submissions_zip));
 $submissions_zip = abs_path($submissions_zip);
@@ -69,7 +73,7 @@ for my $submission_id (keys %md_yaml){
     my $uniqname = Email::Address::XS->new(address => $email)->user();
     my $submission_dir = File::Spec->catdir($assignment_export, $submission_id);
     my ($submission) = capture_stdout {
-        system($options{fun}, $submission_dir);
+        system(@{$options{fun}}, $submission_dir);
     };
     $? >> 8 && carp "[error] problem with $submission_id; skipping…";
     $output{$uniqname} = $submission;
