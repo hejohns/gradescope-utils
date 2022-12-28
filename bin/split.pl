@@ -54,21 +54,23 @@ GetOptions(\%options,
     'delimiter|d=s',
     'keyheader|k=s@',
     'valueheader|v=s@',
-    'tokenfilter=s@',
-    'filtered2json=s@',
-    'sortkeys=s@',
+    'tokenfilter|t=s@',
+    'filtered2json|f=s@',
+    'sortkeys|s=s@',
     'output|o=s',
-    'timeout|t=s', # uses `timeout(1)` values
+    'timeout=s', # uses `timeout(1)` values
     'debug',
+    'tokenheader=s',
+    'uniqnameheader=s',
     ) or pod2usage(-exitval => 1, -verbose => 2);
 pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 2;
 
 $options{delimiter} //= ':';
 $options{keyheader} //= ['token'];
 $options{valueheader} //= ['submission'];
-$options{tokenfilter} //= ['./grep.sh'];
-$options{filtered2json} //= ['tee'];
-$options{sortkeys} //= ['./sort.pl'];
+$options{tokenfilter} //= ['cat'];
+$options{filtered2json} //= ['cat'];
+$options{sortkeys} //= ['true'];
 $options{output} //= File::Temp->newdir(CLEANUP => 0);
 $options{timeout} //= '30s';
 $options{keyheader} = [$options{delimiter}, @{$options{keyheader}}];
@@ -90,7 +92,7 @@ my %submissions = Gradescope::Translate::read_csv($submissions,
     $options{keyheader}, $options{valueheader});
 carp '[debug] %submissions = ' if $options{debug};
 carp Data::Dumper::Dumper(\%submissions) if $options{debug};
-my %token2uniqname = token2uniqname($token2uniqname);
+my %token2uniqname = token2uniqname($token2uniqname, $options{tokenheader}, $options{uniqnameheader});
 for my $token (keys %token2uniqname){
     carp "[debug] token = $token" if $options{debug};
     try{
@@ -159,10 +161,133 @@ split.pl - Gradescope submission script component
 
 =head1 SYNOPSIS
 
-split.pl [options] submissions
+split.pl [options] I<submissions> I<token2uniqname>
 
-does B<not> support -
+split.pl [-d ':' -k token -k problem_id -v score] [-t ./grep.pl -f ./simple.pl] submissions.csv token2uniqname.csv
 
 =head1 DESCRIPTION
+
+splits up the I<submissions> csv
+into individual chunks for upload
+
+can also be used without first using join,
+eg when the submissions are dumped from a sqlite database
+
+note: this is the most complicated script component
+
+=head1 OPTIONS
+
+all commands follow the format of F<./join.pl>
+(from perl's Getopt::Long, like C<cc -I>)
+
+see C<perldoc ./join.pl> for details
+
+=head2 help|h|?
+
+=head2 debug
+
+will be helpful for figuring out exactly what
+tokenfilter and filtered2json need to do
+
+various stages are dumped with perl's Data::Dumper
+
+see B<internal details> below
+
+=head2 delimiter|d
+
+=head2 keyheader|k
+
+=head2 valueheader|v
+
+keyheader and valueheader will be passed to perl's Text::CSV
+to convert I<submissions> to a key-value
+
+this may require joining multiple csv columns for the key,
+so a delimiter may be specified.
+the specific delimiter shouldn't matter-- see filtered2json
+
+=head2 tokenfilter|t
+
+command will be
+fed I<submissions> as json through stdin,
+and passed an additional argument:
+a student's token
+
+command is expected to output the filtered subset of I<submissions>
+for the student,
+as key-value, as json
+
+see filtered2json for an example
+
+=head3 bundled lambdas
+
+=over 4
+
+=item F<./grep.pl>
+
+greps the keys for those that match C</token/>
+(ie that contain the token)
+
+=back
+
+=head2 filtered2json|f
+
+command will be
+fed the filtered submission key-value as json through stdin,
+and passed three additional arguments:
+the student's token,
+the key headers-- joined, but properly escaped so they can be reparsed as a csv line if needed--,
+and the value headers-- ditto
+
+command is expected to output the data for upload, as key-value, as json
+
+eg C<./split.pl -f ./simple.pl …>
+will effectively do C<cat filtered_submission.json | ./simple.pl token keyheader valueheader>
+and expect json stdout
+
+command will be called with a timeout,
+so no need to have the command time itself out
+
+=head3 bundled lambdas
+
+=over 4
+
+=item F<./simple.pl>
+
+assumes valueheader is a single column header
+and just reprints the filtered submission
+for valueheader
+
+=item F<./hazel.pl>
+
+TODO: the dune exec stuff that Yuchen wrote
+
+=back
+
+=head1 relevant internal details
+
+the pipeline looks like this:
+
+[keyheader valueheader] : csv → json
+
+tokenfilter : json → json
+
+filtered2json : json → simple json
+
+[unnamed] : simple json → csv
+
+"csv" uses perl's Text::CSV,
+and represents the sheet as an array of arrays (aoa)--
+but we usually directly parse to a perl hash (of hash)
+
+"json" uses perl's JSON,
+and fairly faithfully encodes perl's hash
+
+"simple json" refers to the fact that the output of filtered2json
+needs to be key-value with plain string values (hash of plain values)
+
+if more complex perl data structures leak through,
+like a hash of hash,
+you'll see HASH(0x*) (or ARRAY(0x*) for hash of array) in the final csv output
 
 =cut

@@ -72,26 +72,16 @@ upload - Gradescope submission script component
 
 =head1 SYNOPSIS
 
-upload.pl
+upload.pl submissions token2uniqname class_id assignment_id
 
-Does not take arguments
+upload.pl output/ token2uniqname.csv 1234 5678
 
 =head1 DESCRIPTION
 
-(`perldoc THIS_FILE` to see this documentation)
+I<submissions> := path to directory of submissions for upload created by ./split.pl
 
-=head2 config
+I<class_id> := gradescope class id
 
-'output dir path' := path to directory of submissions created by ./gen_submissions.pl
-
-'class id' := gradescope class id
-
-'assignment id' := gradescope assignment id
-
-=head1 SEE ALSO
-
-./gen_submissions.pl
-
-./Translate.pm
+I<assignment_id> := gradescope assignment id
 
 =cut

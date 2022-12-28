@@ -39,7 +39,7 @@ use diagnostics -verbose;
     use feature 'try';
     no warnings 'experimental::try';
 
-    our $VERSION = version->declare('v2022.11.13');
+    our $VERSION = version->declare('v2022.12.28');
 # end prelude
 use Gradescope::Translate;
 
@@ -86,6 +86,7 @@ for my $k (sort keys %output){
 }
 Gradescope::Translate::print_csv(\@aoa, *STDOUT);
 if(defined $options{token2uniqname}){
+    carp "'$options{token2uniqname}' already exists; not writing" if -e $options{token2uniqname};
     $options{token2uniqname} = abs_path($options{token2uniqname});
     # generate trivial token2uniqname
     @aoa = ([$Gradescope::Translate::token2uniqname_key_header, $Gradescope::Translate::token2uniqname_value_header]);
@@ -105,9 +106,16 @@ join.pl - Gradescope submission script component
 
 =head1 SYNOPSIS
 
-join.pl [options] gradescope_export_submissions_zip
+join.pl [options] I<gradescope_export_submissions_zip>
+
+join.pl [-f ./cat.pl] [-t token2uniqname.csv] submissions.zip
+
+join.pl [-f ls -f '-l'] [-t token2uniqname.csv] submissions.zip
 
 =head1 DESCRIPTION
+
+converts I<gradescope_export_submissions_zip>
+to single csv
 
 prints csv of all submissions to stdout
 
@@ -119,8 +127,30 @@ does B<not> support -
 
 =head2 fun|lambda|f|λ
 
-defaults to F<cat.pl>
+commands with multiple arguments need to be specified one at a time, in order
+
+an additional argument will be applied:
+the directory path to a student's unzipped submission
+
+eg C<./join.pl -f echo -f abc -f def submissions.zip>
+will execute C<echo abc def /tmp/TMP> and expect stdout
+
+=head3 bundled lambdas
+
+=over 4
+
+=item F<./cat.pl>
+
+C<cat>s everything in the directory.
+
+=back
 
 =head2 token2uniqname|t=s
+
+token2uniqname csv output path
+
+no option ⟹ no write
+
+also does not overwrite an existing file
 
 =cut
