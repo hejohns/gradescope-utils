@@ -47,6 +47,7 @@ use Gradescope::Curl qw(:config baseurl https://www.gradescope.com);
 my %options;
 GetOptions(\%options, 'help|h|?') or pod2usage(-exitval => 1, -verbose => 2);
 pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 4;
+
 # from original python script:
 #   You can get course and assignment IDs from the URL, e.g.:
 #     https://www.gradescope.com/courses/1234/assignments/5678

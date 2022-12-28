@@ -67,31 +67,6 @@ package Gradescope::Translate v2022.11.13 {
         }) or confess Text::CSV->error_diag;
     }
 
-    sub convert_header {
-        my ($header) = @_;
-        if(!defined reftype($header)){
-            return $header;
-        }
-        elsif(reftype($header) eq 'ARRAY'){
-            my @headers = @{$header};
-            return join($headers[0], @headers[1 .. $#headers]);
-        }
-        else{
-            confess;
-        }
-    }
-
-    sub parse_header {
-        my ($delimiter, $s) = @_;
-        my @s = split /$delimiter/, $s;
-        if(@s == 1){
-            return $s;
-        }
-        else{
-            return [$delimiter, @s];
-        }
-    }
-
     sub read_csv {
         my ($csv_path, $key_header, $value_header) = @_;
         my %kv = %{Text::CSV::csv ({
@@ -102,15 +77,17 @@ package Gradescope::Translate v2022.11.13 {
             # `csv` arguments
             in => $csv_path,
             encoding => 'UTF-8',
-            key => convert_header($key_header),
-            value => convert_header($value_header),
+            key => $key_header,
+            value => $value_header,
         }) or confess Text::CSV->error_diag};
         return %kv;
     }
 
     sub token2uniqname {
-        my ($csv) = @_;
-        return read_csv($csv, $token2uniqname_key_header, $token2uniqname_value_header)
+        my ($csv, $key_header, $value_header) = @_;
+        $key_header //= $token2uniqname_key_header;
+        $value_header //= $token2uniqname_value_header;
+        return read_csv($csv, $key_header, $value_header)
     }
 
 }

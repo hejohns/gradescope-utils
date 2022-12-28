@@ -52,8 +52,8 @@ GetOptions(\%options,
 pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 1;
 
 $options{fun} //= ['cat'];
+
 my ($submissions_zip) = @ARGV;
-assert(defined($submissions_zip));
 $submissions_zip = abs_path($submissions_zip);
 my $tmpdir = File::Temp->newdir();
 capture_stdout {
@@ -61,10 +61,10 @@ capture_stdout {
 }, $? >> 8 && confess;
 capture_stdout {
     system('unzip', '-d', $tmpdir, File::Spec->catfile($tmpdir, basename($submissions_zip)))
-}, $? >> 8 && confess;
+}, $? >> 8 && confess "'${\(File::Spec->abs2rel($submissions_zip))}' is probably not a zip";
 my $assignment_export = glob File::Spec->catfile($tmpdir, 'assignment*export');
 my %md_yaml = %{(YAML::XS::LoadFile(File::Spec->catfile($assignment_export, 'submission_metadata.yml')))[0]};
-my %output; # uniqname ↦ submission perl hash accumulator
+my %output; # uniqname ↦ submission	perl hash accumulator
 for my $submission_id (keys %md_yaml){
     use Email::Address::XS (); # use an actual email address parser instead of regex
     # NOTE: I think submitters/email isn't actually who submitted, but the name/email associated w/ the submission's student
@@ -73,7 +73,7 @@ for my $submission_id (keys %md_yaml){
     my $uniqname = Email::Address::XS->new(address => $email)->user();
     my $submission_dir = File::Spec->catdir($assignment_export, $submission_id);
     my ($submission) = capture_stdout {
-        system(@{$options{fun}}, $submission_dir);
+        system(@{$options{fun}}, $submission_dir)
     };
     $? >> 8 && carp "[error] problem with $submission_id; skipping…";
     $output{$uniqname} = $submission;
@@ -81,15 +81,15 @@ for my $submission_id (keys %md_yaml){
 # dump %output to csv
 my @aoa;
 @aoa = (['token', 'submission']);
-for my $k (keys %output){
+for my $k (sort keys %output){
     @aoa = (@aoa, [$k, $output{$k}]);
 }
 Gradescope::Translate::print_csv(\@aoa, *STDOUT);
-if (defined $options{token2uniqname}){
+if(defined $options{token2uniqname}){
     $options{token2uniqname} = abs_path($options{token2uniqname});
     # generate trivial token2uniqname
     @aoa = ([$Gradescope::Translate::token2uniqname_key_header, $Gradescope::Translate::token2uniqname_value_header]);
-    for my $k (keys %output){
+    for my $k (sort keys %output){
         @aoa = (@aoa, [$k, $k]);
     }
     Gradescope::Translate::print_csv(\@aoa, $options{token2uniqname});
