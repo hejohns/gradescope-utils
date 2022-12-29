@@ -29,38 +29,32 @@ during W22
 
 =head2 bin
 
-=head3 download.pl
+The main scripts, in pipeline order:
 
-Contrary to the name, doesn't actually download anything
+=over 4
 
-Takes a zip of submissions from Gradescope and formats the data so gen_submissions.pl can work on it
+=item join.pl : gradescope submissions zip → csv
 
-(for non-A8 workflows)
+I<csv> is single csv of all submissions
 
-=head3 gen_submissions.pl
+=item split.pl : csv → several csv s
 
-Takes a single csv of all student data and parcels it up into individual student submissions for ./upload.pl
+takes csv of all submissions and splits it per student,
+with processing hooks
 
-The single csv is from A8-- a sqlite dump
+=item upload.pl : several csv s → (on gradescope)
 
-=head3 upload.pl
+uploads a directory of submissions (actually not necessarily csv)
 
-uploads all submissions output by gen_submissions.pl
-(or in the correct format, since gen_submissions.pl is fairly A8 specific)
+=back
+
+normal workflows go through all three,
+but eg workflows with student submissions from non-gradescope
+can start at F<split.pl>
 
 =head2 lib
 
-=head3 Translate.pm
-
-Handles token/uid ↦ uniqname translation
-
-A carryover from the scripts' origins w/ A8
-
-Just make uid = uniqname if you don't actually need uid handling
-
-=head3 CurlGradescope.pm
-
-Common curl stuff between scripts
+Perl modules
 
 =head1 SEE ALSO
 

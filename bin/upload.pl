@@ -45,8 +45,13 @@ use Gradescope::Translate qw(token2uniqname);
 use Gradescope::Curl qw(:config baseurl https://www.gradescope.com);
 
 my %options;
-GetOptions(\%options, 'help|h|?') or pod2usage(-exitval => 1, -verbose => 2);
+GetOptions(\%options,
+    'help|h|?',
+    'filetype|f=s',
+) or pod2usage(-exitval => 1, -verbose => 2);
 pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 4;
+
+$options{filetype} //= 'csv';
 
 # from original python script:
 #   You can get course and assignment IDs from the URL, e.g.:
@@ -56,7 +61,7 @@ my ($submissions, $token2uniqname, $class_id, $assignment_id) = @ARGV;
 my %token2uniqname = token2uniqname($token2uniqname);
 my $auth_token = Gradescope::Curl::login();
 for my $t (keys %token2uniqname){
-    my $f = File::Spec->catfile($submissions, "$t.csv");
+    my $f = File::Spec->catfile($submissions, "$t.$options{filetype}");
     say `curl -s -H 'access-token: $auth_token' -F 'owner_email=$token2uniqname{$t}\@umich.edu' -F 'files[]=\@$f' $Gradescope::Curl::baseurl/api/v1/courses/$class_id/assignments/$assignment_id/submissions`;
     carp "[warning] curl return code on $t: ${\($? >> 8)}" if $? >> 8;
     carp "[warning] does $f actually exist?" if $? >> 8;
@@ -83,5 +88,11 @@ I<submissions> := path to directory of submissions for upload created by ./split
 I<class_id> := gradescope class id
 
 I<assignment_id> := gradescope assignment id
+
+=head1 OPTIONS
+
+=head2 filetype|f
+
+eg C<-f csv>
 
 =cut
