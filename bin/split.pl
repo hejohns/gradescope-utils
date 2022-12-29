@@ -44,7 +44,7 @@ use diagnostics -verbose;
 
     our $VERSION = version->declare('v2022.11.13');
 # end prelude
-use Data::Dumper;
+use Data::Printer;
 
 use Gradescope::Translate qw(token2uniqname);
 
@@ -91,7 +91,7 @@ else{
 my %submissions = Gradescope::Translate::read_csv($submissions,
     $options{keyheader}, $options{valueheader});
 carp '[debug] %submissions = ' if $options{debug};
-carp Data::Dumper::Dumper(\%submissions) if $options{debug};
+p %submissions if $options{debug};
 my %token2uniqname = token2uniqname($token2uniqname, $options{tokenheader}, $options{uniqnameheader});
 for my $token (keys %token2uniqname){
     carp "[debug] token = $token" if $options{debug};
@@ -101,7 +101,7 @@ for my $token (keys %token2uniqname){
         };
         my %filtered = %{JSON::from_json $filtered}; # error checking
         carp '[debug] %filtered = ' if $options{debug};
-        carp Data::Dumper::Dumper(\%filtered) if $options{debug};
+        p %filtered if $options{debug};
         next if keys %filtered == 0; # some students may not have submissions
         my ($simple_json) = capture_stdout { # use `timeout(1)` for portability
             # properly escape headers in case they contain delimiters
@@ -130,7 +130,7 @@ for my $token (keys %token2uniqname){
         };
         my %simple_json = %{JSON::from_json $simple_json};
         carp '[debug] %simple_json = ' if $options{debug};
-        carp Data::Dumper::Dumper(\%simple_json) if $options{debug};
+        p %simple_json if $options{debug};
         # TODO: use sortkeys
         my @sorted_keys = sort {
             capture_stdout {
@@ -189,7 +189,7 @@ see C<perldoc ./join.pl> for details
 will be helpful for figuring out exactly what
 tokenfilter and filtered2json need to do
 
-various stages are dumped with perl's Data::Dumper
+various stages are dumped with perl's Data::Printer
 
 see B<internal details> below
 
