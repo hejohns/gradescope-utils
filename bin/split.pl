@@ -26,7 +26,8 @@ use diagnostics -verbose;
     use Capture::Tiny qw(:all);
     # for more complicated stuff
     # eg timeout, redirection
-    use IPC::Run;
+    use IPC::Run qw(run);
+    use IPC::Cmd qw(can_run);
 # option/arg handling
     use Getopt::Long qw(:config gnu_getopt auto_version); # auto_help not the greatest
     use Pod::Usage;
@@ -42,11 +43,12 @@ use diagnostics -verbose;
     use feature 'try';
     no warnings 'experimental::try';
 
-    our $VERSION = version->declare('v2022.11.13');
+    our $VERSION = version->declare('v2022.12.30');
 # end prelude
 use Data::Printer;
 
-use Gradescope::Translate qw(token2uniqname);
+use Gradescope::Translate;
+use Gradescope::Color qw(color_print);
 
 my %options;
 GetOptions(\%options,
@@ -54,102 +56,46 @@ GetOptions(\%options,
     'delimiter|d=s',
     'keyheader|k=s@',
     'valueheader|v=s@',
-    'tokenfilter|t=s@',
-    'filtered2json|f=s@',
-    'sortkeys|s=s@',
-    'output|o=s',
-    'timeout=s', # uses `timeout(1)` values
-    'debug',
-    'tokenheader=s',
-    'uniqnameheader=s',
+    'tokenfilter|t|f|p=s@',
     ) or pod2usage(-exitval => 1, -verbose => 2);
-pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 2;
+pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 1;
 
 $options{delimiter} //= ':';
 $options{keyheader} //= ['token'];
 $options{valueheader} //= ['submission'];
-$options{tokenfilter} //= ['cat'];
-$options{filtered2json} //= ['cat'];
-$options{sortkeys} //= ['true'];
-$options{output} //= File::Temp->newdir(CLEANUP => 0);
-$options{timeout} //= '30s';
+$options{tokenfilter} //= ['true'];
+
 $options{keyheader} = [$options{delimiter}, @{$options{keyheader}}];
 
-my ($submissions, $token2uniqname) = @ARGV;
-$submissions = *STDIN if $submissions eq '-';
-if(-e $options{output}){
-    if(-d _){
-        confess 'nonempty dir!' if @{File::Slurp::read_dir($options{output})};
-    }
-    else{
-        confess 'something else already there!';
-    }
-}
-else{
-    mkdir $options{output} or confess "couldn't create output dir!";
-}
-my %submissions = Gradescope::Translate::read_csv($submissions,
-    $options{keyheader}, $options{valueheader});
-carp '[debug] %submissions = ' if $options{debug};
-p %submissions if $options{debug};
-my %token2uniqname = token2uniqname($token2uniqname, $options{tokenheader}, $options{uniqnameheader});
+my ($submissions) = @ARGV;
+
+my $token2uniqname = do {
+    local $/ = undef;
+    JSON::from_json <STDIN>;
+};
+my %token2uniqname = %{$token2uniqname};
+
+my %submissions;
 for my $token (keys %token2uniqname){
     carp "[debug] token = $token" if $options{debug};
-    try{
-        my ($filtered) = capture_stdout {
-            IPC::Run::run [@{$options{tokenfilter}}, $token], '<', \(JSON::to_json(\%submissions))
-        };
-        my %filtered = %{JSON::from_json $filtered}; # error checking
-        carp '[debug] %filtered = ' if $options{debug};
-        p %filtered if $options{debug};
-        next if keys %filtered == 0; # some students may not have submissions
-        my ($simple_json) = capture_stdout { # use `timeout(1)` for portability
-            # properly escape headers in case they contain delimiters
-            my $keyheader;
-            my $valueheader;
-            Gradescope::Translate::print_csv(
-                [[@{$options{keyheader}}[1 .. $#{$options{keyheader}}]]],
-                \$keyheader);
-            Gradescope::Translate::print_csv(
-                [$options{valueheader}],
-                \$valueheader);
-            # chomp, but CLRF
-            # https://stackoverflow.com/a/15735143
-            $keyheader =~ s/\r?\n\z//;
-            $valueheader =~ s/\r?\n\z//;
-            IPC::Run::run [('timeout',
-                    '--kill-after',
-                    $options{timeout} =~ s/(\d+)/$1 + 5/er, # TODO: idk how long to wait
-                    $options{timeout}),
-                (@{$options{filtered2json}},
-                    $token,
-                    $keyheader,
-                    $valueheader)
-            ], '<', \(JSON::to_json \%filtered);
-            $? >> 8 && die;
-        };
-        my %simple_json = %{JSON::from_json $simple_json};
-        carp '[debug] %simple_json = ' if $options{debug};
-        p %simple_json if $options{debug};
-        # TODO: use sortkeys
-        my @sorted_keys = sort {
+    my %filtered = Gradescope::Translate::read_csv($submissions,
+        $options{keyheader}, $options{valueheader},
+        sub { # see Text::CSV for details
+            my $pred = false;
+            #say JSON::to_json $_[1];
+            my @row = @{$_[1]}; # capture_stdout takes a code ref, so $_[1] inside is shadowed
             capture_stdout {
-                system(@{$options{sortkeys}}, $a, $b)
+                $pred = run [@{$options{tokenfilter}}, $token], '<', \(JSON::to_json \@row);
             };
-            confess "`@{$options{sortkeys}}` failed to exec" if $? == -1;
-            $? >> 8 ? -1 : 1
-        } keys %simple_json;
-        my @aoa = (['key', 'value']);
-        @aoa = (@aoa, [$_, $simple_json{$_}]) for @sorted_keys;
-        Gradescope::Translate::print_csv(\@aoa,
-            File::Spec->catfile($options{output}, "$token.json"));
-    }
-    catch($e){
-        carp "[warning] problem with $token: $e; skipping…"
-    }
+            return $pred;
+        },
+    );
+    delete @filtered{grep {!defined $filtered{$_}} keys %filtered};
+    next if keys %filtered == 0; # some students may not have submissions
+    $submissions{$token} = \%filtered;
 }
 
-say $options{output};
+color_print(JSON::to_json(\%submissions, {pretty => 1, canonical => 1}), 'JSON');
 
 =pod
 

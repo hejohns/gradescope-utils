@@ -37,6 +37,8 @@ The main scripts, in pipeline order:
 
 I<csv> is single csv of all submissions
 
+=item csv2json : csv → json
+
 =item split.pl : csv → several csv s
 
 takes csv of all submissions and splits it per student,

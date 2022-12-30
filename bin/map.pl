@@ -57,17 +57,15 @@ GetOptions(\%options,
     ) or pod2usage(-exitval => 1, -verbose => 2);
 pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 0;
 
-$options{fun} //= ['cat'];
+$options{fun} //= ['tee'];
 $options{timeout} //= '30s';
 
 my %submissions = do { # token ↦ submission
     local $/ = undef;
     %{JSON::from_json <STDIN>};
 };
-my @tokens = keys %submissions;
 my %mapped;
-@mapped{@tokens} = map {
-    my $token = $_;
+for my $token (keys %submissions){
     carp "[debug] token = $token" if $options{debug};
     my $json_obj;
     try{
@@ -86,8 +84,8 @@ my %mapped;
     catch($e){
         carp "[warning] problem with $token: $e; skipping…";
     }
-    $json_obj;
-} @submissions{@tokens};
+    $mapped{$token} = $json_obj;
+}
 
 color_print(JSON::to_json(\%mapped, {pretty => 1, canonical => 1}), 'JSON');
 

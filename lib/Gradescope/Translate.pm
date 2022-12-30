@@ -43,7 +43,8 @@ package Gradescope::Translate v2022.12.30 {
     }
 
     sub read_csv {
-        my ($csv_path, $key_header, $value_header) = @_;
+        my ($csv_path, $key_header, $value_header, $filter) = @_;
+        $filter //= sub {true};
         my %kv = %{Text::CSV::csv ({
             # attributes (OO interface)
             binary => 0,
@@ -51,6 +52,7 @@ package Gradescope::Translate v2022.12.30 {
             strict => 1,
             # `csv` arguments
             in => $csv_path,
+            filter => $filter,
             encoding => 'UTF-8',
             key => $key_header,
             value => $value_header,

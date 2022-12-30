@@ -44,17 +44,20 @@ use diagnostics -verbose;
     our $VERSION = version->declare('v2022.12.27');
 # end prelude
 
-my ($token) = @ARGV;
+my ($column_index, $token) = @ARGV;
+assert(defined($column_index));
 assert(defined($token));
-my %in = %{JSON::from_json <STDIN>};
-my %out = do {
-    my %h;
-    my @interested = grep {m/$token/} keys %in;
-    @h{@interested} = @in{@interested};
-    delete @h{grep {!defined $h{$_}} keys %h};
-    %h;
+my $row = do {
+    local $/ = undef;
+    JSON::from_json <STDIN>;
 };
-print JSON::to_json \%out;
+my @row = @$row;
+if($row[$column_index] eq $token){
+    exit 0;
+}
+else{
+    exit 1;
+}
 
 =pod
 

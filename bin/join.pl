@@ -39,9 +39,8 @@ use diagnostics -verbose;
     use feature 'try';
     no warnings 'experimental::try';
 
-    our $VERSION = version->declare('v2022.12.28');
+    our $VERSION = version->declare('v2022.12.30');
 # end prelude
-use Gradescope::Translate;
 use Gradescope::Color qw(color_print);
 
 my %options;
@@ -51,7 +50,7 @@ GetOptions(\%options,
 ) or pod2usage(-exitval => 1, -verbose => 2);
 pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 1;
 
-$options{fun} //= ['cat'];
+$options{fun} //= ['ls'];
 
 my ($submissions_zip) = @ARGV;
 $submissions_zip = abs_path($submissions_zip);
@@ -119,8 +118,6 @@ join.pl [-f ls -f '-l'] submissions.zip
 
 converts I<gradescope_export_submissions_zip>
 to single csv
-
-prints csv of all submissions to stdout
 
 does B<not> support -
 
