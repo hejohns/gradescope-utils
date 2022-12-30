@@ -1,4 +1,4 @@
-package Gradescope::Translate v2022.12.30 {
+package Gradescope::Color v2022.12.30 {
     use v5.36;
     use utf8;
     use strictures 2; # nice `use strict`, `use warnings` defaults
@@ -14,9 +14,8 @@ package Gradescope::Translate v2022.12.30 {
     # end prelude
     use Carp;
     use Carp::Assert;
-    use Text::CSV;
-    use JSON;
-    use File::Slurp;
+    use IPC::Cmd qw(can_run);
+    use IPC::Run qw(run);
 
     use parent qw(Exporter);
 
@@ -24,40 +23,23 @@ package Gradescope::Translate v2022.12.30 {
     our @EXPORT = qw();
     # optional exports
     our @EXPORT_OK = qw(
-        print_csv
-        read_csv
+        color_print
     );
 
-    sub print_csv {
-        my ($in, $out) = @_;
-        Text::CSV::csv({
-            # attributes (OO interface)
-            binary => 0,
-            decode_utf8 => 0,
-            strict => 1,
-            # `csv` arguments
-            in => $in,
-            out => $out,
-            encoding => ':utf8',
-        }) or confess Text::CSV->error_diag;
+    our $has_colorizer = defined(can_run('bat'));
+    carp '[suggestion] get `bat` for colorized output' if !$has_colorizer;
+
+    sub color_print {
+        my ($str, $language) = @_;
+        if($has_colorizer){
+            run ['bat', '-l', $language], '<', \$str;
+        }
+        else{
+            print $str;
+        }
     }
 
-    sub read_csv {
-        my ($csv_path, $key_header, $value_header) = @_;
-        my %kv = %{Text::CSV::csv ({
-            # attributes (OO interface)
-            binary => 0,
-            decode_utf8 => 0,
-            strict => 1,
-            # `csv` arguments
-            in => $csv_path,
-            encoding => 'UTF-8',
-            key => $key_header,
-            value => $value_header,
-        }) or confess Text::CSV->error_diag};
-        return %kv;
-    }
-
+    true;
 }
 
 =pod

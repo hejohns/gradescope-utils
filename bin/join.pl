@@ -42,12 +42,12 @@ use diagnostics -verbose;
     our $VERSION = version->declare('v2022.12.28');
 # end prelude
 use Gradescope::Translate;
+use Gradescope::Color qw(color_print);
 
 my %options;
 GetOptions(\%options,
     'help|h|?',
     'fun|lambda|f|λ=s@',
-    'token2uniqname|t=s'
 ) or pod2usage(-exitval => 1, -verbose => 2);
 pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 1;
 
@@ -78,23 +78,24 @@ for my $submission_id (keys %md_yaml){
     $? >> 8 && carp "[error] problem with $submission_id; skipping…";
     $output{$uniqname} = $submission;
 }
-# dump %output to csv
-my @aoa;
-@aoa = (['token', 'submission']);
-for my $k (sort keys %output){
-    @aoa = (@aoa, [$k, $output{$k}]);
-}
-Gradescope::Translate::print_csv(\@aoa, *STDOUT);
-if(defined $options{token2uniqname}){
-    carp "'$options{token2uniqname}' already exists; not writing" if -e $options{token2uniqname};
-    $options{token2uniqname} = abs_path($options{token2uniqname});
-    # generate trivial token2uniqname
-    @aoa = ([$Gradescope::Translate::token2uniqname_key_header, $Gradescope::Translate::token2uniqname_value_header]);
-    for my $k (sort keys %output){
-        @aoa = (@aoa, [$k, $k]);
-    }
-    Gradescope::Translate::print_csv(\@aoa, $options{token2uniqname});
-}
+
+# build json array
+my $json_pair;
+$json_pair .= '[';
+# generate trivial token2uniqname
+my %trivial_token2uniqname;
+my @uniqnames = keys %output;
+@trivial_token2uniqname{@uniqnames} = @uniqnames;
+$json_pair .= JSON::to_json(\%trivial_token2uniqname, 'JSON');
+$json_pair .= ',';
+# dump %output to json
+$json_pair .= JSON::to_json(\%output, 'JSON');
+$json_pair .= ']';
+
+# check
+my @json_pair = @{JSON::from_json $json_pair};
+# and print
+color_print(JSON::to_json(\@json_pair, {pretty => 1, canonical => 1}), 'JSON');
 
 =pod
 
@@ -106,11 +107,13 @@ join.pl - Gradescope submission script component
 
 =head1 SYNOPSIS
 
+join.pl : B<zip> (gradescope export submissions zip) B<→> B<[>B<json> (token2uniqname), B<json> (token ↦ submission)B<]> (json array)
+
 join.pl [options] I<gradescope_export_submissions_zip>
 
-join.pl [-f ./cat.pl] [-t token2uniqname.csv] submissions.zip
+join.pl [-f ./cat.pl] submissions.zip
 
-join.pl [-f ls -f '-l'] [-t token2uniqname.csv] submissions.zip
+join.pl [-f ls -f '-l'] submissions.zip
 
 =head1 DESCRIPTION
 
@@ -144,13 +147,5 @@ will execute C<echo abc def /tmp/TMP> and expect stdout
 C<cat>s everything in the directory.
 
 =back
-
-=head2 token2uniqname|t=s
-
-token2uniqname csv output path
-
-no option ⟹ no write
-
-also does not overwrite an existing file
 
 =cut

@@ -49,20 +49,31 @@ GetOptions(\%options,
     'help|h|?',
     'filetype|f=s',
 ) or pod2usage(-exitval => 1, -verbose => 2);
-pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 4;
+pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 2;
 
 $options{filetype} //= 'csv';
+
+$options{filetype} = ".$options{filetype}";
 
 # from original python script:
 #   You can get course and assignment IDs from the URL, e.g.:
 #     https://www.gradescope.com/courses/1234/assignments/5678
 #     course_id = 1234, assignment_id = 5678
-my ($submissions, $token2uniqname, $class_id, $assignment_id) = @ARGV;
-my %token2uniqname = token2uniqname($token2uniqname);
+my ($class_id, $assignment_id) = @ARGV;
+my ($token2uniqname, $submissions) = do {
+    local $/ = undef;
+    @{JSON::from_json <STDIN>}
+};
+my %token2uniqname = %$token2uniqname;
+my %submissions = %$submissions; # token ↦ submission
+
 my $auth_token = Gradescope::Curl::login();
+my $tmpdir = File::Temp->newdir();
+File::Slurp::write_file(File::Spec->catfile($tmpdir, "$_$options{filetype}"), $submissions{$_}) for keys %submissions;
 for my $t (keys %token2uniqname){
-    my $f = File::Spec->catfile($submissions, "$t.$options{filetype}");
-    say `curl -s -H 'access-token: $auth_token' -F 'owner_email=$token2uniqname{$t}\@umich.edu' -F 'files[]=\@$f' $Gradescope::Curl::baseurl/api/v1/courses/$class_id/assignments/$assignment_id/submissions`;
+    my $f = File::Spec->catfile($tmpdir, "$t$options{filetype}");
+    #say `curl -s -H 'access-token: $auth_token' -F 'owner_email=$token2uniqname{$t}\@umich.edu' -F 'files[]=\@$f' $Gradescope::Curl::baseurl/api/v1/courses/$class_id/assignments/$assignment_id/submissions`;
+    system('curl', '-s', '-H', "access-token: $auth_token", '-F', "owner_email=$token2uniqname{$t}\@umich.edu", '-F', "files[]=\@$f", "$Gradescope::Curl::baseurl/api/v1/courses/$class_id/assignments/$assignment_id/submissions");
     carp "[warning] curl return code on $t: ${\($? >> 8)}" if $? >> 8;
     carp "[warning] does $f actually exist?" if $? >> 8;
 }
