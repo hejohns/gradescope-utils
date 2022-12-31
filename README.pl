@@ -33,11 +33,13 @@ The main scripts, in pipeline order:
 
 =over 4
 
-=item join.pl : gradescope submissions zip → csv
+=item join.pl : gradescope submissions zip → json
 
 I<csv> is single csv of all submissions
 
-=item csv2json : csv → json
+=item split : csv → json
+
+=item csv2json : (json, csv) → json
 
 =item split.pl : csv → several csv s
 

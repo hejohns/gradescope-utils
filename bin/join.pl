@@ -78,23 +78,12 @@ for my $submission_id (keys %md_yaml){
     $output{$uniqname} = $submission;
 }
 
-# build json array
-my $json_pair;
-$json_pair .= '[';
 # generate trivial token2uniqname
 my %trivial_token2uniqname;
 my @uniqnames = keys %output;
 @trivial_token2uniqname{@uniqnames} = @uniqnames;
-$json_pair .= JSON::to_json(\%trivial_token2uniqname, 'JSON');
-$json_pair .= ',';
-# dump %output to json
-$json_pair .= JSON::to_json(\%output, 'JSON');
-$json_pair .= ']';
 
-# check
-my @json_pair = @{JSON::from_json $json_pair};
-# and print
-color_print(JSON::to_json(\@json_pair, {pretty => 1, canonical => 1}), 'JSON');
+color_print(JSON::to_json([\%trivial_token2uniqname, \%output], {pretty => 1, canonical => 1}), 'JSON');
 
 =pod
 
