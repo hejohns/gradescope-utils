@@ -26,15 +26,17 @@ use diagnostics -verbose;
     use Capture::Tiny qw(:all);
     # for more complicated stuff
     # eg timeout, redirection
-    use IPC::Run;
+    use IPC::Run qw(run);
+    use IPC::Cmd qw(can_run);
 # option/arg handling
     use Getopt::Long qw(:config gnu_getopt auto_version); # auto_help not the greatest
     use Pod::Usage;
 # use local modules
     use lib (
         dirname(abs_path($0)),
+        abs_path(File::Spec->rel2abs('../lib/', dirname(abs_path($0)))),
         ); # https://stackoverflow.com/a/46550384
-
+ 
 # turn on features
     use builtin qw(true false is_bool reftype);
     no warnings 'experimental::builtin';
@@ -43,33 +45,39 @@ use diagnostics -verbose;
 
     our $VERSION = version->declare('v2022.12.27');
 # end prelude
+use Gradescope::Translate;
+use Gradescope::Color qw(color_print);
 
-my ($column_index, $token) = @ARGV;
-assert(defined($column_index));
-assert(defined($token));
-my $row = do {
-    local $/ = undef;
-    JSON::from_json <STDIN>;
-};
-my @row = @$row;
-if($row[$column_index] eq $token){
-    exit 0;
-}
-else{
-    exit 1;
-}
+my %options;
+GetOptions(\%options,
+    'help|h|?',
+    'delimiter|d=s',
+    'keyheader|k=s@',
+    'valueheader|v=s@',
+    ) or pod2usage(-exitval => 1, -verbose => 2);
+pod2usage(-exitval => 0, -verbose => 2) if $options{help};
+
+$options{delimiter} //= ':';
+$options{keyheader} //= ['token'];
+$options{valueheader} //= ['submission'];
+
+$options{keyheader} = [$options{delimiter}, @{$options{keyheader}}];
+
+my %kv = Gradescope::Translate::read_csv(*STDIN,
+    $options{keyheader}, $options{valueheader});
+color_print(JSON::to_json(\%kv, {pretty => 1, canonical => 1}), 'JSON');
 
 # PODNAME:
-# ABSTRACT: Gradescope submission script F<split.pl> lambda
+# ABSTRACT: Gradescope submission script component
 =pod
 
 =encoding utf8
 
 =head1 SYNOPSIS
 
-field-n-eq?.pl I<column_index> I<token>
+csv2json.pl [options]
 
-field-n-eq?.pl 0 token < csv_row.json
+csv2json.pl [-k token] [-v uniqname] < I<csv>
 
 =head1 DESCRIPTION
 

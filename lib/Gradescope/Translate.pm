@@ -62,36 +62,13 @@ package Gradescope::Translate v2022.12.30 {
 
 }
 
+# ABSTRACT: Gradescope submission script component
 =pod
 
 =encoding utf8
 
-=head1 NAME
-
-Translate - Gradescope submission script component
-
 =head1 DESCRIPTION
 
-(`perldoc THIS_FILE` to see this documentation)
-
-Handles token ↦ uniqname translation
-by just calling Text::CSV::csv basically
-
-This script was originally written for the A8 rust assignment, which stored student submissions by a unique identifier token.
-When submitting to gradescope, the identifier needed to be translated to the corresponding uniqname.
-
-=head2 config
-
-'token,uniqname path' := path to csv with header "token,uniqname"
-
-'token header' := name of token header (was "token" on learnocaml)
-
-'uniqname header' := name of uniqname header (was "nickname" on learnocaml)
-
-=head1 SEE ALSO
-
-./gen_submissions.pl
-
-./upload.pl
+C<Text::CSV> wrappers
 
 =cut

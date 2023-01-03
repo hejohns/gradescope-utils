@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
 
 my @args = (
-    "--date=2022-09-24",
+    "--date=2023-01-03",
     "--center='EECS 490 Gradescope Utilities'",
-    "--release='Fall 2022'",
+    "--release='Winter 2023'",
 );
 exec 'bash', '-c', "pod2man @args $0 | man -l -" or print STDERR "Is bash installed?: $!\n";
 
@@ -33,32 +33,55 @@ The main scripts, in pipeline order:
 
 =over 4
 
-=item join.pl : gradescope submissions zip → json
+=item join.pl : zip → (json, json)
 
 I<csv> is single csv of all submissions
 
-=item split : csv → json
+returns a I<json> pair, (token2uniqname, submissions),
+where submissions is keyed by token
 
-=item csv2json : (json, csv) → json
+Intended for converting a Gradescope submissions export into I<json>
 
-=item split.pl : csv → several csv s
+=item csv2json : csv → json
 
-takes csv of all submissions and splits it per student,
-with processing hooks
+C<Text::CSV> wrapper that converts csv to key-value
 
-=item upload.pl : several csv s → (on gradescope)
+Intended for converting a I<csv> token2uniqname into I<json>,
+as an initial step for F<split.pl>
 
-uploads a directory of submissions (actually not necessarily csv)
+=item split.pl : (json, csv) → json
+
+Takes token2uniqname I<json> and splits I<csv> into I<json> key-value,
+keyed by token
+
+Intended for processing a I<csv> database dump
+
+=item map.pl : json → json
+
+This is where ``the real" processing is hooked in
+
+=item upload.pl : (json, json) → ()
+
+Takes a I<json> pair, (token2uniqname, submissions),
+and uploads to Gradescope
 
 =back
-
-normal workflows go through all three,
-but eg workflows with student submissions from non-gradescope
-can start at F<split.pl>
 
 =head2 lib
 
 Perl modules
+
+=head1 DEPENDENCIES
+
+non-exhaustive list of external programs
+
+=head2 runtime
+
+unzip(1), curl(1), bat(1)
+
+=head2 build
+
+dzil(1)
 
 =head1 SEE ALSO
 

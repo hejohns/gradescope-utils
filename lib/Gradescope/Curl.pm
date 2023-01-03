@@ -64,3 +64,12 @@ package Gradescope::Curl v2022.11.13 {
 
     true;
 }
+
+# ABSTRACT: Gradescope submission script component
+=pod
+
+=encoding utf8
+
+=head1 DESCRIPTION
+
+=cut

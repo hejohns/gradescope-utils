@@ -39,15 +39,18 @@ use diagnostics -verbose;
 # end prelude
 
 my $submission_dir = $ARGV[0];
+assert(defined($submission_dir));
 system('cat', glob "$submission_dir/*");
 
 # PODNAME:
-# ABSTRACT: Gradescope submission script lambda
+# ABSTRACT: Gradescope submission script F<join.pl> lambda
 =pod
 
 =encoding utf8
 
 =head1 SYNOPSIS
+
+cat.pl I<dir>
 
 =head1 DESCRIPTION
 

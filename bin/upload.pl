@@ -86,6 +86,8 @@ for my $t (keys %token2uniqname){
 
 =head1 SYNOPSIS
 
+upload.pl : [token2uniqname, submissions] (json array) → ()
+
 upload.pl submissions token2uniqname class_id assignment_id
 
 upload.pl output/ token2uniqname.csv 1234 5678

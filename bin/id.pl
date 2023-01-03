@@ -41,16 +41,16 @@ use diagnostics -verbose;
     use feature 'try';
     no warnings 'experimental::try';
 
-    our $VERSION = version->declare('v2022.12.27');
+    our $VERSION = version->declare('v2023.01.03');
 # end prelude
 
-assert(@ARGV >= 3);
-my ($token, $keyheader, $valueheader) = @ARGV;
-my %in = %{JSON::from_json <STDIN>};
-my %out;
-my @keys = keys %in;
-@out{@keys} = map {$_->{$valueheader}} @in{@keys};
-print JSON::to_json \%out;
+my ($token) = @ARGV;
+my %in = do {
+    local $/ = undef;
+    %{JSON::from_json <STDIN>};
+};
+say STDERR $token;
+print JSON::to_json \%in;
 
 # PODNAME:
 # ABSTRACT: Gradescope submission script lambda

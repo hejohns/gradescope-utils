@@ -77,7 +77,6 @@ my %token2uniqname = %{$token2uniqname};
 
 my %submissions;
 for my $token (keys %token2uniqname){
-    carp "[debug] token = $token" if $options{debug};
     my %filtered = Gradescope::Translate::read_csv($submissions,
         $options{keyheader}, $options{valueheader},
         sub { # see Text::CSV for details
@@ -105,37 +104,20 @@ color_print(JSON::to_json(\%submissions, {pretty => 1, canonical => 1}), 'JSON')
 
 =head1 SYNOPSIS
 
-split.pl [options] I<submissions> I<token2uniqname>
+split.pl : () → json
 
-split.pl [-d ':' -k token -k problem_id -v score] [-t ./grep.pl -f ./simple.pl] submissions.csv token2uniqname.csv
+split.pl [options] I<submissions>
+
+split.pl [-t ./field-n-eq?.pl] [-d ':' -k problem_id -v score] submissions.csv < token2uniqname.json
 
 =head1 DESCRIPTION
 
 splits up the I<submissions> csv
 into individual chunks for upload
 
-can also be used without first using join,
-eg when the submissions are dumped from a sqlite database
-
-note: this is the most complicated script component
-
 =head1 OPTIONS
 
-all commands follow the format of F<./join.pl>
-(from perl's Getopt::Long, like C<cc -I>)
-
-see C<perldoc ./join.pl> for details
-
 =head2 help|h|?
-
-=head2 debug
-
-will be helpful for figuring out exactly what
-tokenfilter and filtered2json need to do
-
-various stages are dumped with perl's Data::Printer
-
-see B<internal details> below
 
 =head2 delimiter|d
 
@@ -143,95 +125,27 @@ see B<internal details> below
 
 =head2 valueheader|v
 
-keyheader and valueheader will be passed to perl's Text::CSV
-to convert I<submissions> to a key-value
+keyheader and valueheader will be passed to perl's C<Text::CSV>
+to convert I<submissions> to a key-value, for each token2uniqname token
+(ie stdout is a key-value, keyed by token, value is another key-value)
 
 this may require joining multiple csv columns for the key,
 so a delimiter may be specified.
-the specific delimiter shouldn't matter-- see filtered2json
 
 =head2 tokenfilter|t
 
-command will be
-fed I<submissions> as json through stdin,
-and passed an additional argument:
-a student's token
+command will be fed
+a csv row as json through stdin,
+and passed a student's token as a last argument
 
-command is expected to output the filtered subset of I<submissions>
-for the student,
-as key-value, as json
-
-see filtered2json for an example
+command is a predicate that should C<exit 0> iff the csv row should be used for the student with that token
 
 =head3 bundled lambdas
 
 =over 4
 
-=item F<./grep.pl>
-
-greps the keys for those that match C</token/>
-(ie that contain the token)
+=item F<./field-n-eq?.pl>
 
 =back
-
-=head2 filtered2json|f
-
-command will be
-fed the filtered submission key-value as json through stdin,
-and passed three additional arguments:
-the student's token,
-the key headers-- joined, but properly escaped so they can be reparsed as a csv line if needed--,
-and the value headers-- ditto
-
-command is expected to output the data for upload, as key-value, as json
-
-eg C<./split.pl -f ./simple.pl …>
-will effectively do C<cat filtered_submission.json | ./simple.pl token keyheader valueheader>
-and expect json stdout
-
-command will be called with a timeout,
-so no need to have the command time itself out
-
-=head3 bundled lambdas
-
-=over 4
-
-=item F<./simple.pl>
-
-assumes valueheader is a single column header
-and just reprints the filtered submission
-for valueheader
-
-=item F<./hazel.pl>
-
-TODO: the dune exec stuff that Yuchen wrote
-
-=back
-
-=head1 relevant internal details
-
-the pipeline looks like this:
-
-[keyheader valueheader] : csv → json
-
-tokenfilter : json → json
-
-filtered2json : json → simple json
-
-[unnamed] : simple json → csv
-
-"csv" uses perl's Text::CSV,
-and represents the sheet as an array of arrays (aoa)--
-but we usually directly parse to a perl hash (of hash)
-
-"json" uses perl's JSON,
-and fairly faithfully encodes perl's hash
-
-"simple json" refers to the fact that the output of filtered2json
-needs to be key-value with plain string values (hash of plain values)
-
-if more complex perl data structures leak through,
-like a hash of hash,
-you'll see HASH(0x*) (or ARRAY(0x*) for hash of array) in the final csv output
 
 =cut
