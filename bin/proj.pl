@@ -55,7 +55,7 @@ do {
 };
 
 # PODNAME:
-# ABSTRACT: Gradescope submission script lambda
+# ABSTRACT: Gradescope submission script helper
 =pod
 
 =encoding utf8

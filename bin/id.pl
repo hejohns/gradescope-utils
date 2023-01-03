@@ -45,12 +45,12 @@ use diagnostics -verbose;
 # end prelude
 
 my ($token) = @ARGV;
-my %in = do {
+my $in = do {
     local $/ = undef;
-    %{JSON::from_json <STDIN>};
+    JSON::from_json <STDIN>;
 };
 say STDERR $token;
-print JSON::to_json \%in;
+print JSON::to_json $in;
 
 # PODNAME:
 # ABSTRACT: Gradescope submission script lambda

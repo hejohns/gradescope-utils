@@ -43,6 +43,9 @@ DESCRIPTION
            Takes a json pair, (token2uniqname, submissions), and uploads to
            Gradescope
 
+       proj.pl : json -> json
+           0-indexed json array projection
+
    lib
        Perl modules
 

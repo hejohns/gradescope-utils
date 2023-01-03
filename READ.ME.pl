@@ -65,6 +65,10 @@ This is where ``the real" processing is hooked in
 Takes a I<json> pair, (token2uniqname, submissions),
 and uploads to Gradescope
 
+=item proj.pl : json -> json
+
+0-indexed json array projection
+
 =back
 
 =head2 lib
