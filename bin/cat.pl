@@ -40,3 +40,15 @@ use diagnostics -verbose;
 
 my $submission_dir = $ARGV[0];
 system('cat', glob "$submission_dir/*");
+
+# PODNAME:
+# ABSTRACT: Gradescope submission script lambda
+=pod
+
+=encoding utf8
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=cut

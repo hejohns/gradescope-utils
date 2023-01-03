@@ -52,6 +52,8 @@ my @keys = keys %in;
 @out{@keys} = map {$_->{$valueheader}} @in{@keys};
 print JSON::to_json \%out;
 
+# PODNAME:
+# ABSTRACT: Gradescope submission script lambda
 =pod
 
 =encoding utf8

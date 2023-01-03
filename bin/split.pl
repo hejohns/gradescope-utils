@@ -97,13 +97,11 @@ for my $token (keys %token2uniqname){
 
 color_print(JSON::to_json(\%submissions, {pretty => 1, canonical => 1}), 'JSON');
 
+# PODNAME:
+# ABSTRACT: Gradescope submission script component
 =pod
 
 =encoding utf8
-
-=head1 NAME
-
-split.pl - Gradescope submission script component
 
 =head1 SYNOPSIS
 

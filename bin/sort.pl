@@ -47,6 +47,8 @@ use diagnostics -verbose;
 my $ret = $ARGV[0] le $ARGV[1];
 exit $ret;
 
+# PODNAME:
+# ABSTRACT: Gradescope submission script lambda
 =pod
 
 =encoding utf8

@@ -54,6 +54,8 @@ do {
     color_print(JSON::to_json(JSON::from_json(<STDIN>)->[$n], {pretty => 1, canonical => 1}), 'JSON');
 };
 
+# PODNAME:
+# ABSTRACT: Gradescope submission script lambda
 =pod
 
 =encoding utf8

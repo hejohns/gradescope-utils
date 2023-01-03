@@ -85,13 +85,11 @@ my @uniqnames = keys %output;
 
 color_print(JSON::to_json([\%trivial_token2uniqname, \%output], {pretty => 1, canonical => 1}), 'JSON');
 
+# PODNAME:
+# ABSTRACT: Gradescope submission script component
 =pod
 
 =encoding utf8
-
-=head1 NAME
-
-join.pl - Gradescope submission script component
 
 =head1 SYNOPSIS
 

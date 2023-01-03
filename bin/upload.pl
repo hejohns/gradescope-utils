@@ -78,13 +78,11 @@ for my $t (keys %token2uniqname){
     carp "[warning] does $f actually exist?" if $? >> 8;
 }
 
+# PODNAME:
+# ABSTRACT: Gradescope submission script component
 =pod
 
 =encoding utf8
-
-=head1 NAME
-
-upload - Gradescope submission script component
 
 =head1 SYNOPSIS
 

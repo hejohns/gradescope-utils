@@ -59,6 +59,8 @@ else{
     exit 1;
 }
 
+# PODNAME:
+# ABSTRACT: Gradescope submission script lambda
 =pod
 
 =encoding utf8

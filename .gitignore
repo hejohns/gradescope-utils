@@ -3,3 +3,5 @@
 *.json
 *.zip
 *.csv
+.build
+.pls_cache
