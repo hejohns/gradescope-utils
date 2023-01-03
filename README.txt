@@ -16,7 +16,7 @@ DESCRIPTION
    bin
        The main scripts, in pipeline order:
 
-       join.pl : zip X (json, json)
+       join.pl : zip -> (json, json)
            csv is single csv of all submissions
 
            returns a json pair, (token2uniqname, submissions), where submissions is
@@ -24,22 +24,22 @@ DESCRIPTION
 
            Intended for converting a Gradescope submissions export into json
 
-       csv2json : csv X json
+       csv2json : csv -> json
            "Text::CSV" wrapper that converts csv to key-value
 
            Intended for converting a csv token2uniqname into json, as an initial step
            for split.pl
 
-       split.pl : (json, csv) X json
+       split.pl : (json, csv) -> json
            Takes token2uniqname json and splits csv into json key-value, keyed by
            token
 
            Intended for processing a csv database dump
 
-       map.pl : json X json
+       map.pl : json -> json
            This is where ``the real" processing is hooked in
 
-       upload.pl : (json, json) X ()
+       upload.pl : (json, json) -> ()
            Takes a json pair, (token2uniqname, submissions), and uploads to
            Gradescope
 

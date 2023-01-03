@@ -33,7 +33,7 @@ The main scripts, in pipeline order:
 
 =over 4
 
-=item join.pl : zip → (json, json)
+=item join.pl : zip -> (json, json)
 
 I<csv> is single csv of all submissions
 
@@ -42,25 +42,25 @@ where submissions is keyed by token
 
 Intended for converting a Gradescope submissions export into I<json>
 
-=item csv2json : csv → json
+=item csv2json : csv -> json
 
 C<Text::CSV> wrapper that converts csv to key-value
 
 Intended for converting a I<csv> token2uniqname into I<json>,
 as an initial step for F<split.pl>
 
-=item split.pl : (json, csv) → json
+=item split.pl : (json, csv) -> json
 
 Takes token2uniqname I<json> and splits I<csv> into I<json> key-value,
 keyed by token
 
 Intended for processing a I<csv> database dump
 
-=item map.pl : json → json
+=item map.pl : json -> json
 
 This is where ``the real" processing is hooked in
 
-=item upload.pl : (json, json) → ()
+=item upload.pl : (json, json) -> ()
 
 Takes a I<json> pair, (token2uniqname, submissions),
 and uploads to Gradescope

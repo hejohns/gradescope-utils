@@ -104,7 +104,7 @@ color_print(JSON::to_json(\%submissions, {pretty => 1, canonical => 1}), 'JSON')
 
 =head1 SYNOPSIS
 
-split.pl : () → json
+split.pl : () -> json
 
 split.pl [options] I<submissions>
 
