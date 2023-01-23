@@ -1,5 +1,5 @@
 package Gradescope::Translate v2022.12.30 {
-    use v5.34;
+    use v5.36;
     use utf8;
     use strictures 2; # nice `use strict`, `use warnings` defaults
     use open qw(:utf8); # try to use Perl's internal Unicode encoding for everything

@@ -22,7 +22,6 @@ use File::Slurp;
     use lib (
         File::Spec->catdir(dirname(abs_path($0)), 'lib'),
         ); # https://stackoverflow.com/a/46550384
-use Gradescope::Translate;
 
 BEGIN{
     if($^V lt v5.36){
