@@ -17,6 +17,7 @@ use JSON;
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 use File::Spec;
+use File::Slurp;
 # use local modules
     use lib (
         File::Spec->catdir(dirname(abs_path($0)), 'lib'),
@@ -37,16 +38,13 @@ BEGIN{
 
 pod2usage(-exitval => 0, -verbose => 2) if @ARGV;
 
-my $score;
-my @tests;
-for my $test (@tests){ # stub
-    my %test_output;
-    $test_output{name} = $test->{name};
-    $test_output{score} = $test->{score};
-    $test_output{max_score} = $test->{max_score};
-    $score = [@$score, \%test_output];
-}
-$score = 100 if !defined($score);
+my @files = glob('/autograder/submission/*.json');
+should(@files, 1);
+my $submission_path = $files[0];
+my $submission  = JSON::from_json File::Slurp::read_file($submission_path);
+should(reftype $submission, 'HASH');
+assert(defined $submission->{school});
+my $score = 100;
 my %output; # gradescope expects JSON test output
 if(!defined reftype $score){
     say '[debug] Using top level (total) score grading';
@@ -57,10 +55,10 @@ elsif(reftype $score eq 'ARRAY'){
     $output{tests} = $score;
 }
 else{
-    confess "[error] `perldoc $0` to see how 'map submission' is supposed to be used";
+    confess "[error] Hazel code upload sanity check FAILED";
 }
 $output{'stdout_visibility'} = 'visible'; # we shouldn't need to hide any output from this script
-#$output{'output'} = '';
+$output{'output'} = 'Hazel code upload sanity check PASSED ';
 # test output
 open(my $output_fh,
     '>:utf8',
