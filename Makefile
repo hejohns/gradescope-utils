@@ -1,6 +1,6 @@
 default:
-	dzil build
 	./READ.ME.pl > README.txt
+	dzil build
 install-deps:
 	dzil authordeps --missing | cpanm
 clean:
