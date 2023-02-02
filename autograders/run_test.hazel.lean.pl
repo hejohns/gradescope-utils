@@ -57,7 +57,12 @@ else{
     confess "[error] Hazel code upload sanity check FAILED";
 }
 $output{'stdout_visibility'} = 'visible'; # we shouldn't need to hide any output from this script
-$output{'output'} = 'Hazel code upload sanity check PASSED ';
+$output{'output'} = <<~"EOF"
+    Upload appears to be a Hazel json export
+    *No other checks performed*
+    Hazel code upload sanity check PASSED
+EOF
+;
 # test output
 open(my $output_fh,
     '>:utf8',
