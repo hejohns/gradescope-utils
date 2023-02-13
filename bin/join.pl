@@ -93,7 +93,7 @@ color_print(JSON::to_json([\%trivial_token2uniqname, \%output], {pretty => 1, ca
 
 =head1 SYNOPSIS
 
-join.pl : B<zip> (gradescope export submissions zip) B<->> B<[>B<json> (token2uniqname), B<json> (token ↦ submission)B<]> (json array)
+join.pl : B<zip> (gradescope export submissions zip) B<->> B<[>B<json> (token2uniqname), B<json> (token B<->> submission)B<]> (json array)
 
 join.pl [options] I<gradescope_export_submissions_zip>
 
