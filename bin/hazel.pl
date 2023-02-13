@@ -44,7 +44,7 @@ use diagnostics -verbose;
     our $VERSION = version->declare('v2023.02.13');
 # end prelude
 
-my ($token) = @ARGV;
+my ($hazel_grading_repo_path, $token) = @ARGV;
 # `cat.pl` wraps the editor state json as a json string
 my $in = do {
     local $/ = undef;
@@ -54,23 +54,15 @@ my %in = %{JSON::from_json $in};
 #my %in = %{$in};
 my $tmpfile = File::Temp->new();
 print $tmpfile (JSON::to_json \%in);
-chdir "$ENV{HOME}/documentsNoSync/hazel-490/";
+chdir $hazel_grading_repo_path;
 say STDERR $token;
 my $report = capture_stdout {
     system('dune', 'exec', 'src/haz3lschool/gradescope.exe', $tmpfile);
 }, $? >> 8 && confess "something went wrong with '$token'";
-# hack
-my $flag = false;
-my $flag2 = false;
-my @report;
-for (split /\n/, $report){
-    $flag = false if !$flag2 && $flag && !m/\[/;
-    $flag = true if m/Finished/;
-    $flag2 = true if $flag && m/\[/;
-    @report = (@report, $_) if $flag && $flag2;
-}
-#print JSON::to_json (JSON::from_json (join "\n", @report));
-my $out = JSON::from_json (join "\n", @report);
+# NOTE: this is an extremely hacky way to ``grep" the json output from the
+# haz3lschool/gradescope.exe output, relying heavily on the exact output format
+$report =~ s/^.*(?:Finished(?:\s|\\n)+)(\[.*)$/$1/s;
+my $out = JSON::from_json $report;
 my @out = @{$out};
 for my $exercise (@out){
     $exercise->{report}->{'pretty-summary'} = [split /\n/, $exercise->{report}{summary}];
@@ -83,9 +75,11 @@ print JSON::to_json \@out;
 
 =encoding utf8
 
-=head1 NAME
-
 =head1 SYNOPSIS
+
+hazel.pl I<hazel_grading_repo_path> I<token>
+
+map.pl -f ./hazel.pl -f ~/Downloads/hazel-490
 
 =head1 DESCRIPTION
 
