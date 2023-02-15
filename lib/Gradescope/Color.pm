@@ -1,4 +1,4 @@
-package Gradescope::Color v2022.12.30 {
+package Gradescope::Color v2023.02.14 {
     use v5.36;
     use utf8;
     use strictures 2; # nice `use strict`, `use warnings` defaults
@@ -31,7 +31,7 @@ package Gradescope::Color v2022.12.30 {
 
     sub color_print {
         my ($str, $language) = @_;
-        if($has_colorizer){
+        if($has_colorizer && !defined($ENV{GU_NO_PAGER})){
             run ['bat', '-l', $language], '<', \$str;
         }
         else{

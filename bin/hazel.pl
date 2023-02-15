@@ -49,7 +49,7 @@ my $in = do {
     local $/ = undef;
     JSON::from_json <STDIN>;
 };
-my %in = %{JSON::from_json $in};
+my %in = %{$in};
 #my %in = %{$in};
 my $tmpfile = File::Temp->new();
 print $tmpfile (JSON::to_json \%in);
