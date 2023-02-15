@@ -1,11 +1,9 @@
 default:
-	./READ.ME.pl > README.txt
 	dzil build
 test:
 	# for some reason pod syntax checker requires --release flag
 	dzil test --release
 eecs490:
-	./READ.ME.pl > README.txt
 	TMP=$$(mktemp);\
 	cp dist.ini $$TMP;\
 	perl -pi -e 's/^license.*$$//s' dist.ini;\
@@ -16,5 +14,6 @@ install-deps:
 	dzil authordeps --missing | cpanm
 clean:
 	-rm README.txt
+	dzil clean
 
 .PHONY: default eecs490 install-deps clean

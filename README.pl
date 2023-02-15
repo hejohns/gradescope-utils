@@ -1,9 +1,11 @@
 #!/usr/bin/env perl
 
+my $date = $ARGV[0] // '2023-02-14'; # last manually updated time
+my $version = $ARGV[1];
 my @args = (
-    "--date=2023-01-03",
+    "--date='$date'",
     "--center='EECS 490 Gradescope Utilities'",
-    "--release='Winter 2023'",
+    "--release='$version'",
 );
 exec 'bash', '-c', "pod2man @args $0 | man -l -" or print STDERR "Is bash installed?: $!\n";
 
