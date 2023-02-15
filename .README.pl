@@ -3,6 +3,7 @@
 my $date = $ARGV[0] // '2023-02-14'; # last manually updated time
 my $version = $ARGV[1];
 my @args = (
+    "--name='README'",
     "--date='$date'",
     "--center='EECS 490 Gradescope Utilities'",
     "--release='$version'",
