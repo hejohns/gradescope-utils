@@ -45,7 +45,6 @@ use diagnostics -verbose;
 # end prelude
 
 my ($hazel_grading_repo_path, $token) = @ARGV;
-# `cat.pl` wraps the editor state json as a json string
 my $in = do {
     local $/ = undef;
     JSON::from_json <STDIN>;
@@ -82,5 +81,8 @@ hazel.pl I<hazel_grading_repo_path> I<token>
 map.pl -f ./hazel.pl -f ~/Downloads/hazel-490
 
 =head1 DESCRIPTION
+
+this environment needs to C<dune exec src/haz3lschool/gradescope.exe>,
+so make sure C<opam switch> and everything is correct B<for this env/shell>
 
 =cut

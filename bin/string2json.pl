@@ -68,6 +68,9 @@ map.pl -f ./string2json.pl
 
 unwraps quoted json string
 
+often used to combat F<cat.pl>,
+which quotes the student submission as a (json) string
+
 =head1 EXAMPLES
 
 ``on the wire"
