@@ -1,6 +1,9 @@
 default:
 	./READ.ME.pl > README.txt
 	dzil build
+test:
+	# for some reason pod syntax checker requires --release flag
+	dzil test --release
 eecs490:
 	./READ.ME.pl > README.txt
 	TMP=$$(mktemp);\
@@ -9,7 +12,6 @@ eecs490:
 	echo '-remove = License' >> dist.ini;\
 	dzil build;\
 	cp $$TMP dist.ini
-
 install-deps:
 	dzil authordeps --missing | cpanm
 clean:
