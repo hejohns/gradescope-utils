@@ -6,9 +6,10 @@ NAME
 DESCRIPTION
        Collection of scripts for gradescope stuff
 
-       Each file should contain its own documentation
+       Each file should contain its own documentation (the perl scripts will use POD,
+       which can be read with perldoc, or "./script-name --help")
 
-       Below is just a overview
+       Below is just an overview
 
        originally a port of <https://github.com/eecs490/Assignment-8-Gradescope>
        during W22
@@ -61,4 +62,4 @@ DEPENDENCIES
 SEE ALSO
        json_pp(1)
 
-2023.02.15                         Gradescope-Utils                         README(1)
+2023.03.22                         Gradescope-Utils                         README(1)

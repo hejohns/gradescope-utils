@@ -23,8 +23,9 @@ EECS 490 Gradescope Utilities
 Collection of scripts for gradescope stuff
 
 Each file should contain its own documentation
+(the perl scripts will use POD, which can be read with I<perldoc>, or C<./script-name --help>)
 
-Below is just a overview
+Below is just an overview
 
 originally a port of
 L<https://github.com/eecs490/Assignment-8-Gradescope>
