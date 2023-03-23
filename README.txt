@@ -47,8 +47,22 @@ DESCRIPTION
        proj.pl : json -> json
            0-indexed json array projection
 
+       bundled lambdas
+
+       field-n-eq?.pl : TODO
+           split.pl
+
+       misc utilities
+
+       grep.pl : (json kv, regex) -> json kv
+
    lib
        Perl modules
+
+   git submodules
+       related scripts in other git repositories
+
+       gradescope-late-days
 
 DEPENDENCIES
        non-exhaustive list of external programs
@@ -62,4 +76,4 @@ DEPENDENCIES
 SEE ALSO
        json_pp(1)
 
-2023.03.22                         Gradescope-Utils                         README(1)
+2023.03.23                         Gradescope-Utils                         README(1)

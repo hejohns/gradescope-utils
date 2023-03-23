@@ -75,9 +75,33 @@ and uploads to Gradescope
 
 =back
 
+=head3 bundled lambdas
+
+=over 4
+
+=item field-n-eq?.pl : TODO
+
+split.pl
+
+=back
+
+=head3 misc utilities
+
+=over 4
+
+=item grep.pl : (json kv, regex) -> json kv
+
+=back
+
 =head2 lib
 
 Perl modules
+
+=head2 git submodules
+
+related scripts in other git repositories
+
+=head3 gradescope-late-days
 
 =head1 DEPENDENCIES
 
