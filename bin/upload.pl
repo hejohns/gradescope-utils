@@ -48,10 +48,12 @@ my %options;
 GetOptions(\%options,
     'help|h|?',
     'filetype|f=s',
+    'email|e=s', # TODO: this works for us, but is a terrible general procedure
 ) or pod2usage(-exitval => 1, -verbose => 2);
 pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 2;
 
 $options{filetype} //= 'csv';
+$options{email} //= '@umich.edu';
 
 $options{filetype} = ".$options{filetype}";
 
@@ -74,7 +76,7 @@ File::Slurp::write_file(File::Spec->catfile($tmpdir, "$_$options{filetype}"), JS
 for my $t (keys %token2uniqname){
     my $f = File::Spec->catfile($tmpdir, "$t$options{filetype}");
     #say `curl -s -H 'access-token: $auth_token' -F 'owner_email=$token2uniqname{$t}\@umich.edu' -F 'files[]=\@$f' $Gradescope::Curl::baseurl/api/v1/courses/$class_id/assignments/$assignment_id/submissions`;
-    system('curl', '-s', '-H', "access-token: $auth_token", '-F', "owner_email=$token2uniqname{$t}\@umich.edu", '-F', "files[]=\@$f", "$Gradescope::Curl::baseurl/api/v1/courses/$class_id/assignments/$assignment_id/submissions");
+    system('curl', '-s', '-H', "access-token: $auth_token", '-F', "owner_email=$token2uniqname{$t}$options{email}", '-F', "files[]=\@$f", "$Gradescope::Curl::baseurl/api/v1/courses/$class_id/assignments/$assignment_id/submissions");
     say STDERR "";
     carp "[warning] curl return code on $t: ${\($? >> 8)}" if $? >> 8;
     carp "[warning] does $f actually exist?" if $? >> 8;
