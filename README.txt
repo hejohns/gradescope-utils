@@ -1,4 +1,4 @@
-README(1)                  EECS 490 Gradescope Utilities                 README(1)
+README(1)                   EECS 490 Gradescope Utilities                   README(1)
 
 NAME
        EECS 490 Gradescope Utilities
@@ -6,8 +6,8 @@ NAME
 DESCRIPTION
        Collection of scripts for gradescope stuff
 
-       Each file should contain its own documentation (the perl scripts will use
-       POD, which can be read with perldoc, or "./script-name --help")
+       Each file should contain its own documentation (the perl scripts will use POD,
+       which can be read with perldoc, or "./script-name --help")
 
        Below is just an overview
 
@@ -20,16 +20,16 @@ DESCRIPTION
        join.pl : zip -> (json, json)
            csv is single csv of all submissions
 
-           returns a json pair, (token2uniqname, submissions), where submissions
-           is keyed by token
+           returns a json pair, (token2uniqname, submissions), where submissions is
+           keyed by token
 
            Intended for converting a Gradescope submissions export into json
 
        csv2json : csv -> json
            "Text::CSV" wrapper that converts csv to key-value
 
-           Intended for converting a csv token2uniqname into json, as an initial
-           step for split.pl
+           Intended for converting a csv token2uniqname into json, as an initial step
+           for split.pl
 
        split.pl : (json, csv) -> json
            Takes token2uniqname json and splits csv into json key-value, keyed by
@@ -76,4 +76,4 @@ DEPENDENCIES
 SEE ALSO
        json_pp(1)
 
-2023.04.07                       Gradescope-Utils                        README(1)
+2023.04.12                         Gradescope-Utils                         README(1)

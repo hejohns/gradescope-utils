@@ -69,6 +69,12 @@ my ($token2uniqname, $submissions) = do {
 my %token2uniqname = %$token2uniqname;
 my %submissions = %$submissions; # token ↦ submission
 
+open my $tty, '<', '/dev/tty' or confess 'This needs to be run in an interactive shell!';
+my $confirm = IO::Prompter::prompt(
+    "Confirm: is this correct class id and assignment id? $class_id $assignment_id (y/N)? ",
+    -in => $tty
+);
+croak '[error] user cancelled' if $confirm ne 'y';
 my $auth_token = Gradescope::Curl::login();
 my $tmpdir = File::Temp->newdir();
 carp "[debug] $tmpdir";
