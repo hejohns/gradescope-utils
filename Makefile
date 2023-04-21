@@ -10,10 +10,12 @@ eecs490:
 	echo '-remove = License' >> dist.ini;\
 	dzil build;\
 	cp $$TMP dist.ini
+# these are the build system's own dependencies
+# (yeah...)
 install-deps:
 	dzil authordeps --missing | cpanm
 clean:
 	-rm README.txt
 	dzil clean
 
-.PHONY: default eecs490 install-deps clean
+.PHONY: default test eecs490 install-deps clean

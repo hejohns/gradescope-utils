@@ -2,14 +2,27 @@
 # run_test stub
 default: lib setup.sh
 	# fatpack so we don't have to ship our own modules
+	perl -c run_test.lean.pl
 	fatpack pack run_test.lean.pl > run_test.fat.pl
 	zip AG *
 # code upload sanity check
 check-hazel: lib setup.sh
+	perl -c run_test.$@.lean.pl
 	fatpack pack run_test.$@.lean.pl > run_test.fat.pl
 	zip AG *
 # grade haz3l A1
 grade-hazel: lib setup.sh
+	perl -c run_test.$@.lean.pl
+	fatpack pack run_test.$@.lean.pl > run_test.fat.pl
+	zip AG *
+# grade A8 rustviz quiz
+rustviz-quiz: lib setup.sh
+	perl -c run_test.$@.lean.pl
+	fatpack pack run_test.$@.lean.pl > run_test.fat.pl
+	zip AG *
+# grade A8 repair rust
+repair-rust: lib setup.sh
+	perl -c run_test.$@.lean.pl
 	fatpack pack run_test.$@.lean.pl > run_test.fat.pl
 	zip AG *
 

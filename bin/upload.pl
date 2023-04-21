@@ -52,7 +52,7 @@ GetOptions(\%options,
 ) or pod2usage(-exitval => 1, -verbose => 2);
 pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 2;
 
-$options{filetype} //= 'csv';
+$options{filetype} //= 'json';
 $options{email} //= '@umich.edu';
 
 $options{filetype} = ".$options{filetype}";
