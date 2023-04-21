@@ -43,11 +43,18 @@ my $submission_path = $files[0];
 my $submission = JSON::from_json File::Slurp::read_file($submission_path);
 # upload is a json hash of question -> answer
 should(reftype $submission, 'HASH');
-my $score = 4 * $submission->{score};
+my $score;
+if(defined($submission->{score})){
+    $score = 4 * $submission->{score};
+}
+else{
+    $score = 0;
+}
 my %output; # gradescope expects JSON test output
 if(!defined reftype $score){
     say '[debug] Using top level (total) score grading';
     $output{score} = $score;
+    $output{output} = $submission->{edit_state} if defined($submission->{edit_state});
 }
 elsif(reftype $score eq 'ARRAY'){
     say '[debug] Using individual tests grading';
