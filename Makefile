@@ -1,4 +1,7 @@
-default:
+default: install-deps test
+	cabal install field-n-eq --installdir=./bin/
+	mv bin/field-n-eq bin/field-n-eq?
+	# final
 	dzil build
 test:
 	# for some reason pod syntax checker requires --release flag
@@ -8,7 +11,7 @@ eecs490:
 	cp dist.ini $$TMP;\
 	perl -pi -e 's/^license.*$$//s' dist.ini;\
 	echo '-remove = License' >> dist.ini;\
-	dzil build;\
+	make;\
 	cp $$TMP dist.ini
 # bin/ dependencies
 install-deps:
@@ -21,6 +24,7 @@ install-deps:
 	# ruby stuff
 	bundler install
 	# haskell stuff
+	cabal build --only-dependencies
 # these are the build system's own dependencies
 # (yeah...)
 install-build-deps:

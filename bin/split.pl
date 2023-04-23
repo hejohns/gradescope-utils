@@ -84,7 +84,7 @@ for my $token (keys %token2uniqname){
             #say JSON::to_json $_[1];
             my @row = @{$_[1]}; # capture_stdout takes a code ref, so $_[1] inside is shadowed
             capture_stdout {
-                $pred = run [@{$options{tokenfilter}}, $token], '<', \(JSON::to_json \@row);
+                $pred = run [@{$options{tokenfilter}}, JSON::to_json $token], '<', \(JSON::to_json \@row);
             };
             return $pred;
         },
