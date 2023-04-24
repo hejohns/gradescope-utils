@@ -44,15 +44,15 @@ use diagnostics -verbose;
     our $VERSION = version->declare('v2022.12.27');
 # end prelude
 
-my ($column_index, $token) = @ARGV;
-assert(defined($column_index));
-assert(defined($token));
+should(@ARGV, 2)
+my $column_index = $ARGV[0];
+my $match = JSON::from_json $ARGV[1];
 my $row = do {
     local $/ = undef;
     JSON::from_json <STDIN>;
 };
 my @row = @$row;
-if($row[$column_index] eq $token){
+if($row[$column_index] eq $match){
     exit 0;
 }
 else{
@@ -67,9 +67,9 @@ else{
 
 =head1 SYNOPSIS
 
-field-n-eq?.pl I<column_index> I<token>
+field-n-eq?.pl I<column_index> I<match>
 
-field-n-eq?.pl 0 token < csv_row.json
+field-n-eq?.pl 0 match < csv_row.json
 
 =head1 DESCRIPTION
 

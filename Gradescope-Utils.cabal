@@ -73,6 +73,7 @@ executable field-n-eq
                      ,vector
                      ,bytestring
                      ,utf8-string
+                     ,getopt-generics
 
     -- Directories containing source files.
     hs-source-dirs:   bin
