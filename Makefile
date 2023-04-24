@@ -1,11 +1,9 @@
-default: install-deps test
-	cabal install field-n-eq --installdir=./bin/
+default: install-deps
+	cabal install field-n-eq --installdir=./bin/ --install-method=copy
 	mv bin/field-n-eq bin/field-n-eq?
 	# final
 	dzil build
-test:
-	# for some reason pod syntax checker requires --release flag
-	dzil test --release
+	dzil test --release # for some reason pod syntax checker requires --release flag
 eecs490:
 	TMP=$$(mktemp);\
 	cp dist.ini $$TMP;\
@@ -32,4 +30,4 @@ install-build-deps:
 clean:
 	dzil clean
 
-.PHONY: default test eecs490 install-deps install-build-deps clean
+.PHONY: default eecs490 install-deps install-build-deps clean

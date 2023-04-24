@@ -49,7 +49,7 @@ Moreover, the modularity allows you to plug in your own scripts as the need aris
 - args: filepath to a **csv** (eg a sqlite dump),
 and hooks to configure what ends up in **submissions**
 
-comes with a wrapper to run each student in parallel, [`parallel.rb`](#parallel.rb)
+comes with a wrapper to run each student in parallel, [`parallel.rb`](#parallelrb)
 
 ##### map.pl : **json hash** → **json hash**
 - stdin: **json hash**
