@@ -30,7 +30,6 @@ install-deps:
 install-build-deps:
 	dzil authordeps --missing | cpanm
 clean:
-	-rm README.txt
 	dzil clean
 
 .PHONY: default test eecs490 install-deps install-build-deps clean
