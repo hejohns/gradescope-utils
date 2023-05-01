@@ -43,7 +43,7 @@ use diagnostics -verbose;
     use feature 'try';
     no warnings 'experimental::try';
 
-    our $VERSION = version->declare('v2022.12.30');
+    our $VERSION = version->declare('v2023.04.30');
 # end prelude
 use Data::Printer;
 
@@ -57,35 +57,36 @@ GetOptions(\%options,
     'keyheader|k=s@',
     'valueheader|v=s@',
     'tokenfilter|t|f|p=s@',
+    'debug',
     ) or pod2usage(-exitval => 1, -verbose => 2);
 pod2usage(-exitval => 0, -verbose => 2) if $options{help} || @ARGV < 1;
 
 $options{delimiter} //= ':';
-$options{keyheader} //= ['token'];
-$options{valueheader} //= ['submission'];
+if(!defined $options{keyheader} || !defined $options{valueheader} || !defined $options{tokenfilter}){
+    carp '[error] `-k`, `-v` required-- see `--help`';
+    pod2usage(-exitval => 0, -verbose => 2);
+}
 $options{tokenfilter} //= ['true'];
-
 $options{keyheader} = [$options{delimiter}, @{$options{keyheader}}];
 
 my ($submissions) = @ARGV;
-
 my $token2uniqname = do {
     local $/ = undef;
     JSON::from_json <STDIN>;
 };
 my %token2uniqname = %{$token2uniqname};
-
 my %submissions;
 for my $token (keys %token2uniqname){
     my %filtered = Gradescope::Translate::read_csv($submissions,
         $options{keyheader}, $options{valueheader},
         sub { # see Text::CSV for details
             my $pred = false;
-            #say JSON::to_json $_[1];
             my @row = @{$_[1]}; # capture_stdout takes a code ref, so $_[1] inside is shadowed
+            say STDERR "[debug] running tokenfilter cmd: @{$options{tokenfilter}} ${\(JSON::to_json $token)} ${\(JSON::to_json \@row)}" if $options{debug};
             capture_stdout {
                 $pred = run [@{$options{tokenfilter}}, JSON::to_json $token], '<', \(JSON::to_json \@row);
             };
+            say STDERR "[debug] returned: ${\($pred ? 'true' : 'false')}" if $options{debug};
             return $pred;
         },
     );
@@ -104,16 +105,16 @@ color_print(JSON::to_json(\%submissions, {pretty => 1, canonical => 1}), 'JSON')
 
 =head1 SYNOPSIS
 
-split.pl : () -> json
+split.pl : B<token2uniqname → csv → submissions>
 
-split.pl [options] I<submissions>
+split.pl [options] I<submissions_csv>
 
-split.pl [-t ./field-n-eq?.pl] [-d ':' -k problem_id -v score] submissions.csv < token2uniqname.json
+split.pl [-t ./field-n-eq?] [-k problem_id -v score] submissions.csv < token2uniqname.json
 
 =head1 DESCRIPTION
 
-splits up the I<submissions> csv
-into individual chunks for upload
+splits up I<submissions_csv>
+into a B<submissions> json hash
 
 =head1 OPTIONS
 
@@ -125,12 +126,15 @@ into individual chunks for upload
 
 =head2 valueheader|v
 
-keyheader and valueheader will be passed to perl's C<Text::CSV>
-to convert I<submissions> to a key-value, for each token2uniqname token
-(ie stdout is a key-value, keyed by token, value is another key-value)
+I<keyheader> and I<valueheader> will be passed to perl's C<Text::CSV>
+to convert I<submissions_csv> to a key-value,
+for each B<token2uniqname> token
 
 this may require joining multiple csv columns for the key,
-so a delimiter may be specified.
+so a delimiter may be specified with C<-d> for joining multiple C<-k> headers
+
+note that since I<tokenfilter> filters the csv per student,
+there is no need to include the student's token as part of a multi-I<keyheader>
 
 =head2 tokenfilter|t
 
@@ -140,12 +144,8 @@ and passed a student's token as a last argument
 
 command is a predicate that should C<exit 0> iff the csv row should be used for the student with that token
 
-=head3 bundled lambdas
+=head2 debug
 
-=over 4
-
-=item F<./field-n-eq?.pl>
-
-=back
+to see what C<-f> should be
 
 =cut

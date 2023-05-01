@@ -39,9 +39,9 @@ Moreover, the modularity allows you to plug in your own scripts as the need aris
 
 #### the main scripts, in approximate pipeline order:
 ##### join.pl : **zip** → [**token2uniqname**, **submissions**]
-- stdin: a Gradescope submissions export **zip**
+- stdin: n/a
 - stdout: json pair of (**token2uniqname**, **submissions**)
-- args: hooks to configure what ends up in **submissions**
+- args: a Gradescope submissions export **zip**, and hooks to configure what ends up in **submissions**
 
 ##### split.pl : **token2uniqname** → **csv** → **submissions**
 - stdin: **token2uniqname**

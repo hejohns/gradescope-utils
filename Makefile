@@ -4,6 +4,8 @@ default: install-deps
 	# final
 	dzil build
 	dzil test --release # for some reason pod syntax checker requires --release flag
+install: default
+	perl install.pl
 eecs490:
 	TMP=$$(mktemp);\
 	cp dist.ini $$TMP;\
@@ -30,4 +32,4 @@ install-build-deps:
 clean:
 	dzil clean
 
-.PHONY: default eecs490 install-deps install-build-deps clean
+.PHONY: default install eecs490 install-deps install-build-deps clean
