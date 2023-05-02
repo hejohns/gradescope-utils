@@ -1,3 +1,6 @@
 [submodule "submodules/gradescope-late-days"]
 	path = submodules/gradescope-late-days
 	url = git@github.com:eecs490/gradescope-late-days.git
+[submodule "submodules/canvas-utils"]
+	path = submodules/canvas-utils
+	url = git@github.com:eecs490/canvas-utils.git

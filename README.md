@@ -14,6 +14,7 @@ during W22
 
 ## GETTING STARTED
 
+### preface
 First, to address a common concern:
 Yes, most of the scripts are written in Perl.
 But Gradescope-Utils (hereafter GU) does not presuppose Perl knowledge
@@ -29,8 +30,26 @@ Most scripts are half a terminal--
 the job is just split over so many files so each step is well defined,
 and so you can see how the data looks at each step.
 Moreover, the modularity allows you to plug in your own scripts as the need arises.
+### installing
+You don't *need* to install anything (just `git clone` and relative path everything),
+but there is a convenience wrapper.
+
+The two commands are
+`make install`
+or `make install-lite`.
+This installs a wrapper `gu` to `~/.local/bin`.
+See OVERVIEW.
+
+`make install` builds everything, which requires **a lot** of dependencies,
+so you probably want to `make install-lite` which uses the included tarball.
 
 ## OVERVIEW
+### `gu` wrapper
+- `gu --help` brings up this README
+- `gu upload.pl ARGS` calls `bin/upload.pl ARGS`
+- etc
+(`~/.local/bin` should already be in `$PATH`, but you may need to manually add it)
+
 ### bin
 "types":
 
@@ -61,7 +80,7 @@ comes with a wrapper to run each student in parallel, [`parallel.rb`](#parallelr
 - stdout: debug messages
 - args: Gradescope class and assignment ids
 
-#### help utilities
+#### helper utilities
 ##### id.pl : a → a
 for testing
 ##### parallel.rb
@@ -76,4 +95,7 @@ for testing
 
 ### lib
 
+## BUGS
+Please raise issues on the [github](https://github.com/eecs490/gradescope-utils)
+or email [hejohns@umich.edu](mailto:hejohns@umich.edu)
 ## SEE ALSO
