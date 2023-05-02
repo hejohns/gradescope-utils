@@ -91,7 +91,7 @@ my $local_bin = File::Spec->catdir($ENV{HOME}, '.local', 'bin');
 if(!-e $local_bin){
     run ['mkdir', '-p', File::Spec->catdir($ENV{HOME}, '.local', 'bin')] or croak '[error] `mkdir` failed';
 }
-run ['ln', '-fs', File::Spec->catfile($local_share, 'bin', 'gu.pl'), File::Spec->catfile($ENV{HOME}, '.local', 'bin', 'gradescope-utils.pl')] or croak '[error] `ln` failed';
+run ['ln', '-fs', File::Spec->catfile($local_share, 'bin', 'gradescope-utils.pl'), File::Spec->catfile($ENV{HOME}, '.local', 'bin', 'gu')] or croak '[error] `ln` failed';
 
 =pod
 

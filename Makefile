@@ -6,6 +6,8 @@ default: install-deps
 	dzil test --release # for some reason pod syntax checker requires --release flag
 install: default
 	perl install.pl
+install-lite:
+	perl install.pl
 eecs490:
 	TMP=$$(mktemp);\
 	cp dist.ini $$TMP;\
