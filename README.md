@@ -4,7 +4,7 @@
 EECS 490 Gradescope Utilities
 
 ## DESCRIPTION
-Collection of scripts for gradescope stuff
+Suite of scripts for gradescope stuff
 
 Each file should contain its own documentation, which can be displayed by running `--help`
 
