@@ -51,6 +51,7 @@ my %options;
 GetOptions(\%options,
     'help|h|?',
 ) or pod2usage(-exitval => 1, -verbose => 2);
+$ENV{PATH} = "${\(File::Spec->catdir($ENV{HOME}, '.local', 'share', 'gradescope-utils', 'bin'))}:$ENV{PATH}";
 if(@ARGV == 0){
     color_print(scalar(File::Slurp::read_file(File::Spec->catfile($ENV{HOME}, '.local', 'share', 'gradescope-utils', 'README.md'))), 'md');
 }
