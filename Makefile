@@ -1,13 +1,15 @@
-default: install-deps
+default: install-deps install.packed.pl
 	cabal install field-n-eq --installdir=./bin/ --install-method=copy
 	mv bin/field-n-eq bin/field-n-eq?
 	# final
 	dzil build
 	dzil test --release # for some reason pod syntax checker requires --release flag
+install.packed.pl: install.pl
+	fatpack pack install.pl > install.packed.pl
 install: default
 	perl install.pl
 install-lite:
-	perl install.pl
+	perl install.packed.pl
 eecs490:
 	TMP=$$(mktemp);\
 	cp dist.ini $$TMP;\
