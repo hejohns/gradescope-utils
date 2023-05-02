@@ -57,31 +57,41 @@ say STDERR "[debug] using version: $latest_version";
 # NOTE: we could use the perl equivalents for portability, but I'm assuming so much *nix anyways, there's no point
 # (ie sorry windows users)
 my $local_share = File::Spec->catdir($ENV{HOME}, '.local', 'share', 'gradescope-utils');
-if(-e $local_share){
-    my $confirm = IO::Prompter::prompt(
-        "Confirm: update existing install at '$local_share'? (y/N)? ",
-        -in => *STDIN
-    );
-    croak '[error] user cancelled' if $confirm ne 'y';
-}
-else{
-    run ['mkdir', '-p', $local_share] or croak '[error] mkdir failed';
-}
+my $confirm_overwrite_install = sub{
+    if(-e $local_share){
+        my $confirm = IO::Prompter::prompt(
+            "Confirm: update existing install at '$local_share'? (y/N)? ",
+            -in => *STDIN
+        );
+        croak '[error] user cancelled' if $confirm ne 'y';
+    }
+    else{
+        run ['mkdir', '-p', $local_share] or croak '[error] `mkdir` failed';
+    }
+};
 @builds = grep {m/^Gradescope-Utils-$latest_version(\.tar\.gz)?$/} @builds;
 # prefer the regular build dir over the tar 'd one, if it exists
 if(grep {m/^Gradescope-Utils-$latest_version$/} @builds){
     say STDERR "[debug] using build at 'Gradescope-Utils-$latest_version/'";
-    `cp -r ${\(File::Spec->catdir("Gradescope-Utils-$latest_version", 'bin'))} $local_share`;
+    &$confirm_overwrite_install;
+    run ['cp', '-rT', "Gradescope-Utils-$latest_version", $local_share] or croak '[error] `cp` failed';
 }
 elsif(grep {m/\.tar\.gz$/} @builds){
     say STDERR "[debug] using build at 'Gradescope-Utils-$latest_version.tar.gz'";
+    &$confirm_overwrite_install;
     my $tmpdir = File::Temp->newdir();
-    `tar -xf Gradescope-Utils-$latest_version.tar.gz -C $tmpdir`;
-    `cp -r $tmpdir $local_share`;
+    run ['tar', '-xf', "Gradescope-Utils-$latest_version.tar.gz", '-C', $tmpdir] or croak '[error] `tar` failed';
+    run ['cp', '-rT', File::Spec->catdir($tmpdir, "Gradescope-Utils-$latest_version"), $local_share] or croak '[error] `cp` failed';
 }
 else{
     croak '[error] no suitable builds found';
 }
+
+my $local_bin = File::Spec->catdir($ENV{HOME}, '.local', 'bin');
+if(!-e $local_bin){
+    run ['mkdir', '-p', File::Spec->catdir($ENV{HOME}, '.local', 'bin')] or croak '[error] `mkdir` failed';
+}
+run ['ln', '-fs', File::Spec->catfile($local_share, 'bin', 'gu.pl'), File::Spec->catfile($ENV{HOME}, '.local', 'bin', 'gradescope-utils.pl')] or croak '[error] `ln` failed';
 
 =pod
 
