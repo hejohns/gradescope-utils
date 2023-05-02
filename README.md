@@ -43,6 +43,12 @@ See OVERVIEW.
 `make install` builds everything, which requires **a lot** of dependencies,
 so you probably want to `make install-lite` which uses the included tarball.
 
+You may still need to install some cpan modules:
+- `cpan Want`
+- `cpan strictures`
+- `cpan Carp::Assert`
+- `cpan File::Slurp`
+
 ## OVERVIEW
 ### `gu` wrapper
 - `gu --help` brings up this README
