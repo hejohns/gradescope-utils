@@ -17,9 +17,6 @@ use diagnostics -verbose;
 # misc file utilities
     use File::Temp;
     use File::Slurp;
-    use Text::CSV;
-    use JSON;
-    use YAML::XS;
 # misc scripting IO utilities
     use IO::Prompter;
     # `capture_stdout` for backticks w/o shell (escaping issues)
