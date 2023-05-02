@@ -31,7 +31,7 @@ the job is just split over so many files so each step is well defined,
 and so you can see how the data looks at each step.
 Moreover, the modularity allows you to plug in your own scripts as the need arises.
 ### installing
-You don't *need* to install anything (just `git clone` and relative path everything),
+You don't *need* to install these scripts (just `git clone` and relative path everything),
 but there is a convenience wrapper.
 
 The two commands are
@@ -43,11 +43,18 @@ See OVERVIEW.
 `make install` builds everything, which requires **a lot** of dependencies,
 so you probably want to `make install-lite` which uses the included tarball.
 
-You may still need to install some cpan modules:
+Although you may still need to install some cpan modules, that many of the perl scripts use:
 - `cpan Want`
 - `cpan strictures`
 - `cpan Carp::Assert`
 - `cpan File::Slurp`
+- `cpan IO::Prompter`
+- `cpan Capture::Prompter`
+- `cpan IPC::Run`
+
+`gu` itself doesn't strictly need these,
+but so many of the other scripts do,
+you'll have to install them.
 
 ## OVERVIEW
 ### `gu` wrapper
