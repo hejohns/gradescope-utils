@@ -51,6 +51,7 @@ Although you may still need to install some cpan modules, that many of the perl 
 - `cpan IO::Prompter`
 - `cpan Capture::Prompter`
 - `cpan IPC::Run`
+- or whenever you get the "you may need to install the FOO::BAR module" message
 
 `gu` itself doesn't strictly need these,
 but so many of the other scripts do,
