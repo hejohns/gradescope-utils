@@ -1,4 +1,5 @@
 # TODO: sorted of tested-- c/p from my bash history
+# TODO: also somewhat "old"
 
 # schema in almost c/p able form:
 # (you'd probably want intermediate files on the first run)
