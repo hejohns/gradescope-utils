@@ -47,29 +47,32 @@ use diagnostics -verbose;
 # end prelude
 use Gradescope::Color qw(color_print);
 
+my @ARGV_pristine = @ARGV;
 my %options;
 GetOptions(\%options,
     'help|h|?',
-) or pod2usage(-exitval => 1, -verbose => 2);
+    'list|l',
+);
 $ENV{PATH} = "${\(File::Spec->catdir($ENV{HOME}, '.local', 'share', 'gradescope-utils', 'bin'))}:$ENV{PATH}";
-if(@ARGV == 0){
+if($options{help} && @ARGV == 0){
     color_print(scalar(File::Slurp::read_file(File::Spec->catfile($ENV{HOME}, '.local', 'share', 'gradescope-utils', 'README.md'))), 'md');
+    exit 0;
 }
-elsif($options{help} && @ARGV){
-    if(can_run($ARGV[0])){
-        exec(@ARGV, '--help');
-    }
-    else{
-        croak "[error] `@ARGV` failed to run";
-    }
+if($options{list} && @ARGV == 0){
+    say basename($_) for (grep {-x} File::Slurp::read_dir(File::Spec->catdir($ENV{HOME}, '.local', 'share', 'gradescope-utils', 'bin'), {prefix => 1}));
+    exit 0;
+}
+if(@ARGV == 0){
+    # same as help
+    color_print(scalar(File::Slurp::read_file(File::Spec->catfile($ENV{HOME}, '.local', 'share', 'gradescope-utils', 'README.md'))), 'md');
+    exit 0;
+}
+# fix ARGV for subcommand calls
+if(can_run($ARGV_pristine[0])){
+    exec(@ARGV_pristine);
 }
 else{
-    if(can_run($ARGV[0])){
-        exec(@ARGV);
-    }
-    else{
-        croak "[error] `@ARGV` failed to run";
-    }
+    croak "[error] `@ARGV_pristine` failed to run";
 }
 
 # PODNAME:

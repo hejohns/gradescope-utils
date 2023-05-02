@@ -50,6 +50,9 @@ so you probably want to `make install-lite` which uses the included tarball.
 - etc
 (`~/.local/bin` should already be in `$PATH`, but you may need to manually add it)
 
+#### examples
+- `gu map.pl -f gu -f singletonkv2scalar.pl < submissions.json`
+
 ### bin
 "types":
 
@@ -75,23 +78,13 @@ comes with a wrapper to run each student in parallel, [`parallel.rb`](#parallelr
 - stdout: **json hash** (with same keys)
 - args: λ to run on each value
 
-#### upload.pl : [**token2uniqname**, **submissions**] → ()
+##### upload.pl : [**token2uniqname**, **submissions**] → ()
 - stdin: json pair of (**token2uniqname**, **submissions**)
 - stdout: debug messages
 - args: Gradescope class and assignment ids
 
-#### helper utilities
-##### id.pl : a → a
-for testing
-##### parallel.rb
-##### singletonkv2scalar.pl : **json hash** → **json**
-##### proj.pl : **json array** → **json**
-##### grep.pl : **json hash** → **json hash**
-##### mergekv.pl : **json hash**
-##### json2string.pl
-##### string2json.pl
-##### csv2json.pl
-##### field-n-eq? : **json array** → Bool
+#### helper utilities/λs
+see `gu --list`
 
 ### lib
 
