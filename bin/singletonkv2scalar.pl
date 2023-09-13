@@ -73,13 +73,14 @@ else{
 
 =head1 SYNOPSIS
 
-grep.pl : json hash -> json hash
+singletonkv2scalar.pl : B<json hash → json>
 
-grep.pl regex
+does not take args
 
 =head1 DESCRIPTION
 
-(on the keys)
+stdin: a json hash with one key
+stdout: just the single value
 
 =cut
 
