@@ -6,4 +6,14 @@
 .build
 .pls_cache
 
+dist-newstyle/
+vendor/
+
+autograders/fatlib
+autograders/lib
+autograders/run_test.fat.pl
+autograders/setup.sh
+
 bin/field-n-eq?
+
+Gradescope-Utils-*
