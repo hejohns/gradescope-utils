@@ -42,7 +42,7 @@ should(@files, 1);
 my $submission_path = $files[0];
 my $submission  = JSON::from_json File::Slurp::read_file($submission_path);
 should(reftype $submission, 'HASH');
-assert(defined $submission->{school});
+assert(defined $submission->{exercise});
 my $score = 100;
 my %output; # gradescope expects JSON test output
 if(!defined reftype $score){
