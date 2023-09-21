@@ -35,6 +35,9 @@ install-deps:
 	cpan IO::Prompter
 	cpan IPC::Run
 	cpan Test::Pod
+	cpan Dist::Zilla
+	cpan strictures
+	cpan File::Slurp
 	# ruby
 	bundler install
 	# haskell
@@ -42,7 +45,7 @@ install-deps:
 # these are the build system's own dependencies
 # (yeah...)
 install-build-deps:
-	dzil authordeps --missing | cpan
+	dzil authordeps --missing | cpanm -n
 install-runtime-deps:
 	# nonexhaustive list
 	cpan Want
