@@ -5,3 +5,5 @@
 *.csv
 .build
 .pls_cache
+
+bin/field-n-eq?
