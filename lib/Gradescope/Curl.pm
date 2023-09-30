@@ -56,7 +56,7 @@ package Gradescope::Curl v2022.11.13 {
         open my $tty, '<', '/dev/tty' or confess 'This needs to be run in an interactive shell!';
         my $email = IO::Prompter::prompt('Enter your email: ', -in => $tty);
         my $password = IO::Prompter::prompt('Enter your password: ', -in => $tty, -echo => '');
-        my %response = %{JSON::from_json(`curl -s --data 'email=$email&password=$password' $baseurl/api/v1/user_session`)};
+        my %response = %{JSON::from_json(`curl -s --data-urlencode 'email=$email' --data-urlencode 'password=$password' $baseurl/api/v1/user_session`)};
         carp '[warning] curl returned error code on gradescope auth' if $? >> 8;
         $response{token} // confess "[error] Your gradescope login credentials are probably wrong";
         carp "[debug] token_expiration_time: $response{token_expiration_time}";
