@@ -56,7 +56,7 @@ print $tmpfile (JSON::to_json \%in);
 chdir $hazel_grading_repo_path;
 say STDERR $token;
 my $report = capture_stdout {
-    system('dune', 'exec', 'src/haz3lschool/gradescope.exe', $tmpfile);
+    system('dune', 'exec', '--profile', 'release', 'src/haz3lschool/gradescope.exe', $tmpfile);
 }, $? >> 8 && confess "something went wrong with '$token'";
 # NOTE: this is an extremely hacky way to ``grep" the json output from the
 # haz3lschool/gradescope.exe output, relying heavily on the exact output format
