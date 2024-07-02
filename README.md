@@ -45,21 +45,10 @@ see `gu --list`
 TODO: document ./lib/
 
 ## GETTING STARTED
-
-### preface
-First, to address a common concern:
-Yes, most of the scripts are written in Perl.
-But Gradescope-Utils (hereafter GU) does *not* require familiarity with Perl.
-The extensional behavior of each script should be clear enough that--
-barring bonafide bugs--
-you should never need to read the source.
-
-Second, I realize this all seems rather complicated for a simple task.
-But GU arose from a need.
-Most scripts are half a terminal.
-The job is just split over many files so each step is transparent,
-and so you can see the data.
-Moreover, the modularity allows you to plug in your own scripts as the need arises.
+### basic idea
+This is a collection of combinators for processing (primarily json and csv) grading data.
+Generally, each combinator should do *one* simple task, reading from stdin and writing to stdout.
+This allows you to (post-)compose combinators to modularly build up your full script.
 ### installing
 You don't *need* to install these scripts-- just `git clone` and relative path everything--,
 but there is a convenience wrapper.
